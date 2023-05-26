@@ -13,3 +13,14 @@ model SomeData {
   required Boolean
   number   Int     @db.SmallInt
 }
+
+model User {
+  id   Int  @id @default(autoincrement())
+  user_id   String @unique
+  name String
+  email String   @unique
+  status String
+  pair_id String?
+  team_id String?
+  task_progress_id String?
+}

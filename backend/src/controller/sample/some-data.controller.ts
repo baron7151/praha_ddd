@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
 import { GetSomeDataResponse } from './response/get-some-data-response'
-import { PostSomeDataRequest } from './request/post-some-data-request'
+import { PostSomeDataRequest } from '../request/post-user-data-request'
 import { GetSomeDataUseCase } from '../../app/sample/get-some-data-usecase'
 import { PostSomeDataUseCase } from '../../app/sample/post-some-data-usecase'
 import { SomeDataRepository } from 'src/infra/db/repository/sample/some-data-repository'

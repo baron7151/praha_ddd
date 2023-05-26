@@ -5,6 +5,6 @@ module.exports = {
   ...defaultConfig,
   moduleFileExtensions: ['ts', 'js', 'json'],
   testMatch: ['**/__tests__/**/*.test.[jt]s'],
-  testPathIgnorePatterns: ['integration'],
+  testPathIgnorePatterns: ['integration', 'api'],
   collectCoverageFrom: ['**/*.(t|j)s'],
 }

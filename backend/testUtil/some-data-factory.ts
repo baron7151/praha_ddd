@@ -1,6 +1,6 @@
-import * as faker from 'faker'
 import { SomeData } from 'src/domain/some-data/some-data'
 import { prisma } from '@testUtil/prisma'
+import { faker } from '@faker-js/faker'
 
 export const seedSomeData = async (params: {
   id?: string
@@ -9,7 +9,7 @@ export const seedSomeData = async (params: {
 }) => {
   const { id, required, number } = params
   const someDataEntity = new SomeData({
-    id: id ?? faker.random.uuid(),
+    id: id ?? faker.string.uuid(),
     required: required ?? true,
     number: number ?? 1,
   })

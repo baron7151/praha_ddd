@@ -3,13 +3,12 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber } from 'class-validator'
 
-export class PostSomeDataRequest {
+export class PostUserDataRequest {
   @ApiProperty()
   @IsNotEmpty()
-  readonly required!: boolean
+  readonly name!: string
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
-  readonly number!: number
+  readonly email!: string
 }
