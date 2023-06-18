@@ -1,8 +1,12 @@
-import { Id } from '../id'
+import { BaseUuid } from '../common/base-uuid'
+
+export class TeamId extends BaseUuid {
+  private type = 'TeamId'
+}
 export class TeamEntity {
   private teamName: TeamName
-  private teamId: string
-  constructor(teamName: TeamName, teamId: string) {
+  private teamId: TeamId
+  constructor(teamName: TeamName, teamId: TeamId) {
     this.teamName = teamName
     this.teamId = teamId
   }
@@ -13,7 +17,7 @@ export class TeamEntity {
     if (!(other instanceof TeamEntity)) {
       return false
     }
-    return this.teamId === other.teamId
+    return this.teamId.getId() === other.teamId.getId()
   }
   changeTeamName(teamName: TeamName): TeamEntity {
     return new TeamEntity(teamName, this.teamId)

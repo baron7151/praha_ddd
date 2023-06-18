@@ -1,33 +1,63 @@
-import { Name } from '../name'
-import { Email } from '../email'
-import { Id } from '../id'
+import { Email } from '../common/email'
+import { BaseUuid } from '../common/base-uuid'
+import {
+  TaskProgressEntity,
+  TaskProgressId,
+} from '../task/task-progress-entity'
+import { PairId } from '../pair/pair-entity'
+import { TeamId } from '../team/team-entity'
 
-type UserStatus = 'registered' | 'suspension' | 'withdrawal'
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DELETE = 'DELETE',
+}
+
+export class UserId extends BaseUuid {
+  private type = 'UserId'
+}
+
+export class UserName {
+  constructor(public readonly value: string) {
+    this.validate(value)
+  }
+  private validate(value: string) {
+    if (typeof value !== 'string') {
+      throw new Error(`This name is invalid. ${this.value}`)
+    }
+  }
+  changeName(name: string): UserName {
+    return new UserName(name)
+  }
+  equals(name: UserName) {
+    return this.value === name.value ? true : false
+  }
+}
 
 export class UserEntity {
-  private userName: Name
+  private userId: UserId
+  private userName: UserName
   private email: Email
-  private userId: String
-  private pairId?: String
-  private teamId?: String
-  private taskProgressId?: String
   private status: UserStatus
+  private pairId?: PairId
+  private teamId?: TeamId
+  private taskProgressId?: TaskProgressId
   constructor(
-    userId: String,
-    userName: Name,
+    userId: UserId,
+    userName: UserName,
     email: Email,
     status: UserStatus,
-    taskProgressId?: String,
-    pairId?: String,
-    teamId?: String,
+    pairId?: PairId,
+    teamId?: TeamId,
+    taskProgressId?: TaskProgressId,
   ) {
-    this.pairId = pairId
-    this.teamId = teamId
+    this.userId = userId
     this.userName = userName
     this.email = email
-    this.userId = userId
-    this.taskProgressId = taskProgressId
     this.status = status
+    this.pairId = pairId
+    this.teamId = teamId
+    this.taskProgressId = taskProgressId
   }
   equals(other: UserEntity): boolean {
     if (other === null || other === undefined) {
@@ -37,24 +67,46 @@ export class UserEntity {
     if (!(other instanceof UserEntity)) {
       return false
     }
-    return this.userId === other.userId
+    return this.userId.getId() === other.userId.getId()
   }
   getAllProperties() {
     return {
-      pairId: this.pairId,
-      teamId: this.teamId,
-      userId: this.userId,
-      userName: this.userName,
-      email: this.email,
-      taskProgressId: this.taskProgressId,
+      userId: this.userId.value,
+      userName: this.userName.value,
+      email: this.email.value,
       status: this.status,
+      pairId: this.pairId?.value,
+      teamId: this.teamId?.value,
+      taskProgressId: this.taskProgressId?.value,
     }
   }
   canJoin(): boolean {
-    if (this.status == 'registered') {
+    if (this.status == UserStatus.ACTIVE) {
       return true
     } else {
       return false
     }
+  }
+  changeStatus(status: UserStatus): UserEntity {
+    return new UserEntity(
+      this.userId,
+      this.userName,
+      this.email,
+      status,
+      this.pairId,
+      this.teamId,
+      this.taskProgressId,
+    )
+  }
+  changeUserName(userName: UserName): UserEntity {
+    return new UserEntity(
+      this.userId,
+      userName,
+      this.email,
+      this.status,
+      this.pairId,
+      this.teamId,
+      this.taskProgressId,
+    )
   }
 }

@@ -1,12 +1,16 @@
-import { Id } from '../id'
+import { BaseUuid } from '../common/base-uuid'
+
+export class TaskId extends BaseUuid {
+  private type = 'TaskId'
+}
 export class TaskEntity {
   private taskName: string
-  private taskId: Id
-  private task: string
-  constructor(taskName: string, taskId: Id, task: string) {
+  private taskId: TaskId
+  private taskDetail: string
+  constructor(taskName: string, taskId: TaskId, taskDetail: string) {
     this.taskName = taskName
     this.taskId = taskId
-    this.task = task
+    this.taskDetail = taskDetail
   }
   equal(other: TaskEntity): boolean {
     if (other == null || other == undefined) {

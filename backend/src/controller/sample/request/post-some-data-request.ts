@@ -6,9 +6,9 @@ import { IS_NOT_EMPTY, IsNotEmpty, IsNumber } from 'class-validator'
 export class PostSomeDataRequest {
   @ApiProperty()
   @IsNotEmpty()
-  name!: string
+  required!: boolean
 
   @ApiProperty()
   @IsNotEmpty()
-  email!: string
+  number!: number
 }

@@ -16,11 +16,11 @@ model SomeData {
 
 model User {
   id   Int  @id @default(autoincrement())
-  user_id   String @unique
-  name String
+  userId   String @unique
+  userName String
   email String   @unique
   status String
-  pair_id String?
-  team_id String?
-  task_progress_id String?
+  pairId String?
+  teamId String?
+  taskProgressId String?
 }

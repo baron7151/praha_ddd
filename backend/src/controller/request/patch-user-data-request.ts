@@ -3,12 +3,17 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber } from 'class-validator'
 
-export class PostUserDataRequest {
+export class PatchUserDataRequest {
   @ApiProperty()
   @IsNotEmpty()
-  readonly user_name!: string
+  readonly user_id!: string
 
   @ApiProperty()
-  @IsNotEmpty()
-  readonly email!: string
+  readonly user_name?: string
+
+  @ApiProperty()
+  readonly email?: string
+
+  @ApiProperty()
+  readonly status?: string
 }

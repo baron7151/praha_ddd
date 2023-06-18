@@ -1,24 +1,30 @@
-import { Id } from '../id'
+import { BaseUuid } from '../common/base-uuid'
+import { UserId } from '../user/user-entity'
+import { TaskId } from './task-entity'
 
 enum TaskStatus {
   action = '未着手',
   ready = 'レビュー待ち',
   done = '完了',
 }
+
+export class TaskProgressId extends BaseUuid {
+  private type = 'TaskProgressId'
+}
 export class TaskProgressEntity {
   private taskStatus: TaskStatus
-  private taskProgressId: Id
-  private taskId: Id
-  private memberId: Id
+  private taskProgressId: TaskProgressId
+  private taskId: TaskId
+  private userId: UserId
   constructor(
     taskStatus: TaskStatus,
-    taskId: Id,
-    memberId: Id,
-    taskProgressId: Id,
+    taskId: TaskId,
+    userId: UserId,
+    taskProgressId: TaskProgressId,
   ) {
     this.taskStatus = taskStatus
     this.taskId = taskId
-    this.memberId = memberId
+    this.userId = userId
     this.taskProgressId = taskProgressId
   }
   equal(other: TaskProgressEntity): boolean {

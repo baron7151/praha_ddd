@@ -1,21 +1,26 @@
 export class Email {
-  private email: string
+  public value: string
   constructor(email: string) {
-    const expression = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
-    if (!expression.test(email) && email != '') {
+    const expression =
+      /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/
+    if (!expression.test(email) || email === '') {
       throw new Error('The format of the email address is incorrect.')
     } else if (email.length > 254) {
       throw new Error('The email address exceeds 254 characters.')
     }
-    this.email = email
+    this.value = email
   }
   changeEmail(email: string): Email {
-    const expression = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+    const expression =
+      /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/
     if (!expression.test(email)) {
       throw new Error('The format of the email address is incorrect.')
     } else if (email.length > 254) {
       throw new Error('The email address exceeds 254 characters.')
     }
     return new Email(email)
+  }
+  equals(email: Email) {
+    return this.value === email.value ? true : false
   }
 }

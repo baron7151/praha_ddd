@@ -1,11 +1,13 @@
-import { Email } from '../email'
-import { Id } from '../id'
-import { UserEntity } from './user-entity'
+import { Email } from '../common/email'
+import { UserDataDTO } from './user-dto'
+import { UserEntity, UserId } from './user-entity'
 
 export interface IUserRepository {
-  find(userId: Id): UserEntity
-  save(user: UserEntity): Promise<UserEntity>
-  exists(email: Email): boolean
+  findByEmail(email: string): Promise<UserDataDTO | undefined>
+  findByUserId(userId: string): Promise<UserDataDTO | undefined>
+  save(saveUesrData: UserDataDTO): Promise<void>
+  exists(email: string): Promise<boolean>
+  update(updateUserData: UserDataDTO, userId: string): Promise<void>
 }
 
 export interface IUserFactory {

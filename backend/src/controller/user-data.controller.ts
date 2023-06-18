@@ -6,52 +6,57 @@ import {
   Param,
   Query,
   Patch,
+  Inject,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
 import { GetUserDataResponse } from './response/get-user-data-response'
-import { PostUserDataRequest } from './request/post-user-data-request'
-import { GetSomeDataUseCase } from '../app/sample/get-some-data-usecase'
-import { PostSomeDataUseCase } from '../app/sample/post-some-data-usecase'
-import { SomeDataRepository } from 'src/infra/db/repository/sample/some-data-repository'
-import { PrismaClient } from '@prisma/client'
-import { SomeDataQS } from 'src/infra/db/query-service/sample/some-data-qs'
-import { UserDataQS } from 'src/infra/db/query-service/user-data-qs'
 import { GetUserDataUseCase } from 'src/app/get-user-data-usecase'
+import { PostUserDataRequest } from './request/post-user-data-request'
+import { PatchUserDataRequest } from './request/patch-user-data-request'
+import { PostUserDataUseCase } from 'src/app/post-user-data-usecase'
+import { PatchUserDataUseCase } from 'src/app/patch-user-data-usecase'
 @Controller({
   path: '/user',
 })
 export class UserController {
+  constructor(
+    @Inject(GetUserDataUseCase) private readonly getUsecase: GetUserDataUseCase,
+    @Inject(PostUserDataUseCase)
+    private readonly postUsecase: PostUserDataUseCase,
+    @Inject(PatchUserDataUseCase)
+    private readonly patchUsecase: PatchUserDataUseCase,
+  ) {}
+
   @Get()
-  async findUserByName(@Query('name') name: string) {
-    const prisma = new PrismaClient()
-    const qs = new UserDataQS(prisma)
-    const usecase = new GetUserDataUseCase(qs)
-    const result = await usecase.do(name)
+  @ApiResponse({ status: 200, type: GetUserDataResponse })
+  async findUserByName(@Query('user_name') user_name: string) {
+    const result = await this.getUsecase.do(user_name)
     const response = new GetUserDataResponse({ userDatas: result })
     return response
   }
-
+  @Get()
+  @ApiResponse({ status: 200, type: GetUserDataResponse })
   async findUsers() {
-    const prisma = new PrismaClient()
-    const qs = new UserDataQS(prisma)
-    const usecase = new GetUserDataUseCase(qs)
-    const result = await usecase.do()
+    const result = await this.getUsecase.do()
     const response = new GetUserDataResponse({ userDatas: result })
     return response
   }
 
-  // @Post()
-  // async postUserData(
-  //   @Body() postUserDataDto: PostUserDataRequest,
-  // ): Promise<void> {
-  //   const prisma = new PrismaClient()
-  //   const repo = new UserDataRepository(prisma)
-  //   const usecase = new PostSomeDataUseCase(repo)
-  //   await usecase.do({
-  //     required: postSomeDataDto.required,
-  //     number: postSomeDataDto.number,
-  //   })
-  // }
+  @Post()
+  @ApiResponse({ status: 201 })
+  async postUserData(@Body() postUserDataDto: PostUserDataRequest) {
+    await this.postUsecase.do(postUserDataDto.user_name, postUserDataDto.email)
+  }
+
+  @Patch()
+  @ApiResponse({ status: 200 })
+  async patchUserData(@Body() patchUserDataDto: PatchUserDataRequest) {
+    await this.patchUsecase.do({
+      ...patchUserDataDto,
+      userId: patchUserDataDto.user_id,
+      userName: patchUserDataDto.user_name,
+    })
+  }
 
   // @Patch()
   // async updateUser(@Body() xxx: xxx) {}

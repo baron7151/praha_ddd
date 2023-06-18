@@ -1,16 +1,12 @@
-import { PairEntity, PairName } from '../pair/pairEntity'
-import { Id } from '../id'
-import { TeamEntity, TeamName } from '../team/team-entity'
-import { Name } from 'src/domain/name'
-import { UserEntity } from '../user/user-entity'
-import { createRandomIdString } from 'src/util/random'
-import { Email } from '../email'
+import { PairEntity, PairId, PairName } from '../pair/pair-entity'
+import { TeamEntity, TeamId, TeamName } from '../team/team-entity'
+import { uuid } from 'uuidv4'
 
 test('test PairEntity', () => {
   const pairName = new PairName('a')
-  const teamId = createRandomIdString()
-  const pairId = createRandomIdString()
-  const pairId2 = createRandomIdString()
+  const teamId = new TeamId(uuid())
+  const pairId = new PairId(uuid())
+  const pairId2 = new PairId(uuid())
   const pair1 = new PairEntity(pairName, pairId, teamId)
   const pair2 = new PairEntity(pairName, pairId, teamId)
   const pair3 = new PairEntity(pairName, pairId2, teamId)
@@ -65,28 +61,11 @@ test('test TeamName', () => {
 
 test('test TeamEntity', () => {
   const teamName = new TeamName('123')
-  const teamId1 = createRandomIdString()
-  const teamId2 = createRandomIdString()
+  const teamId1 = new TeamId(uuid())
+  const teamId2 = new TeamId(uuid())
   const team1 = new TeamEntity(teamName, teamId1)
   const team2 = new TeamEntity(teamName, teamId1)
   const team3 = new TeamEntity(teamName, teamId2)
   expect(team1.equal(team2.changeTeamName(new TeamName('234')))).toBe(true)
   expect(team1.equal(team3)).toBe(false)
-})
-
-test('Name', () => {
-  const name = new Name('abc')
-  expect(name.changeName('123') instanceof Name).toBe(true)
-})
-
-test('test userEntity', () => {
-  const userId = createRandomIdString()
-  const name = new Name('test1')
-  const email = new Email('test@test.com')
-  const status = 'registered'
-  const user = new UserEntity(userId, name, email, status)
-  expect(user instanceof UserEntity).toBe(true)
-  const properties = user.getAllProperties()
-  expect(properties.userId).toBe(userId)
-  expect(properties.pairId).toBe(undefined)
 })

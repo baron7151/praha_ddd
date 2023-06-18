@@ -1,9 +1,14 @@
-import { Id } from '../id'
+import { BaseUuid } from '../common/base-uuid'
+import { TeamId } from '../team/team-entity'
+
+export class PairId extends BaseUuid {
+  private type = 'PairId'
+}
 export class PairEntity {
   private pairName: PairName
-  private pairId: string
-  private teamId: string
-  constructor(pairName: PairName, pairId: string, teamId: string) {
+  private pairId: PairId
+  private teamId: TeamId
+  constructor(pairName: PairName, pairId: PairId, teamId: TeamId) {
     this.pairName = pairName
     this.pairId = pairId
     this.teamId = teamId
@@ -19,9 +24,9 @@ export class PairEntity {
     if (!(other instanceof PairEntity)) {
       return false
     }
-    return this.pairId === other.pairId
+    return this.pairId.getId() === other.pairId.getId()
   }
-  getId(): string {
+  getId(): PairId {
     return this.pairId
   }
 }

@@ -1,4 +1,3 @@
-import { Id } from 'src/domain/id'
 import { TeamEntity, TeamName } from './team-entity'
 import { ITeamRepository } from './team-repository'
 
