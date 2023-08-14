@@ -16,10 +16,8 @@ export class PatchUserDataUseCase {
     userName?: string
     email?: string
     status?: string
-    pairId?: string
-    teamId?: string
   }): Promise<void> {
-    const { userId, email, userName, status, pairId, teamId } = data
+    const { userId, email, userName, status } = data
     const userEntity = await this.userRepository.findByUserId(
       new UserId(userId),
     )
@@ -29,8 +27,6 @@ export class PatchUserDataUseCase {
         newUserName: userName,
         newEmail: email,
         newStatus: status,
-        newPairId: pairId,
-        newTeamId: teamId,
       })
       await this.userRepository.save(newUserEntity)
     } else {

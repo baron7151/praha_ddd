@@ -55,8 +55,6 @@ export class UserController {
       userName: patchUserDataDto.user_name,
       email: patchUserDataDto.email,
       status: patchUserDataDto.status,
-      pairId: patchUserDataDto.pair_id,
-      teamId: patchUserDataDto.team_id,
     })
   }
 

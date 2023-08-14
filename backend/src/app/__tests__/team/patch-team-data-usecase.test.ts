@@ -43,7 +43,7 @@ describe('PatchTeamDataUseCase', () => {
       const teamName = new TeamName('1').value
       const pairIds = [new UserId().value, new UserId().value]
 
-      mockTeamRepository.findByTeamId.mockResolvedValueOnce(null)
+      mockTeamRepository.findByTeamId.mockResolvedValueOnce(undefined)
 
       await expect(
         patchTeamDataUseCase.do({ teamId, teamName, pairIds }),

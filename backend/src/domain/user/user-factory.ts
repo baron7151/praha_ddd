@@ -86,12 +86,12 @@ export class UserFactory {
       newPairId === undefined
         ? pairId === undefined
           ? undefined
-          : new PairId(pairId.value)
+          : pairId
         : new PairId(newPairId),
       newTeamId === undefined
         ? teamId === undefined
           ? undefined
-          : new TeamId(teamId.value)
+          : teamId
         : new TeamId(newTeamId),
     )
   }

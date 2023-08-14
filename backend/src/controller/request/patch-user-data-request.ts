@@ -16,10 +16,4 @@ export class PatchUserDataRequest {
 
   @ApiProperty()
   readonly status?: string
-
-  @ApiProperty()
-  readonly pair_id?: string
-
-  @ApiProperty()
-  readonly team_id?: string
 }
