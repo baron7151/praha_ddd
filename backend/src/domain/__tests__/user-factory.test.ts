@@ -1,4 +1,4 @@
-import { mockUserRepository } from '@testUtil/mock/infra/repository/user-data-repository.mock'
+import { mockUserRepository } from '@testUtil/mock/infra/repository/repository.mock'
 import { UserFactory } from '../user/user-factory'
 import { uuid } from 'uuidv4'
 import { UserStatus, UserEntity } from '../user/user-entity'
@@ -19,8 +19,8 @@ describe('UserFactory', () => {
 
       const { userName, email } = userEntity.getAllProperties()
       expect(userEntity instanceof UserEntity).toBe(true)
-      expect(userName).toBe(testUserName)
-      expect(email).toBe(testEmail)
+      expect(userName.value).toBe(testUserName)
+      expect(email.value).toBe(testEmail)
     })
 
     it('should return the Error', async () => {
@@ -35,47 +35,45 @@ describe('UserFactory', () => {
 
     describe('create', () => {
       it('should return the UserEntity', () => {
-        const testUserId = uuid()
-        const testUserName = 'test2'
-        const testEmail = 'test2@example.com'
-        const testStatus = UserStatus.INACTIVE
-        const userEntity = UserFactory.create(
-          testUserId,
-          testUserName,
-          testEmail,
-          testStatus,
-        )
+        const testUser = {
+          userId: uuid(),
+          userName: 'test2',
+          email: 'test2@example.com',
+          status: UserStatus.ACTIVE,
+        }
+
+        const userEntity = UserFactory.create(testUser)
         const { userName, email, status } = userEntity.getAllProperties()
         expect(userEntity instanceof UserEntity).toBe(true)
-        expect(userName).toBe(testUserName)
-        expect(email).toBe(testEmail)
-        expect(status).toBe(testStatus)
+        expect(userName.value).toBe(testUser.userName)
+        expect(email.value).toBe(testUser.email)
+        expect(status).toBe(testUser.status)
       })
     })
     describe('reconstruct', () => {
-      it('should return the UserEntity', () => {
-        const testUserId = uuid()
-        const testUserName = 'test2'
-        const testEmail = 'test2@example.com'
-        const testStatus = UserStatus.INACTIVE
-        const testUserEntity = UserFactory.create(
-          testUserId,
-          testUserName,
-          testEmail,
-          testStatus,
-        )
-        const updateUserName = 'test3'
-        const updateEmail = 'test3@example.com'
-        const userEntity = UserFactory.reconstruct(
-          testUserEntity,
-          updateUserName,
-          updateEmail,
-        )
+      it('should return the UserEntity', async () => {
+        const testUser = {
+          userId: uuid(),
+          userName: 'test2',
+          email: 'test2@example.com',
+          status: UserStatus.ACTIVE,
+        }
+        const testUserEntity = UserFactory.create(testUser)
+        mockUserRepository.exists = jest.fn().mockReturnValue(false)
+        const userFactory = new UserFactory(mockUserRepository)
+
+        const newUserName = 'test3'
+        const newEmail = 'test3@example.com'
+        const userEntity = await userFactory.reconstruct({
+          userEntity: testUserEntity,
+          newUserName: newUserName,
+          newEmail: newEmail,
+        })
         const { userName, email, status } = userEntity.getAllProperties()
         expect(userEntity instanceof UserEntity).toBe(true)
-        expect(userName).toBe(updateUserName)
-        expect(email).toBe(updateEmail)
-        expect(status).toBe(testStatus)
+        expect(userName.value).toBe(newUserName)
+        expect(email.value).toBe(newEmail)
+        expect(status).toBe(testUser.status)
       })
     })
   })

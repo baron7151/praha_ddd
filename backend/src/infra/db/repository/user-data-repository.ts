@@ -1,101 +1,84 @@
 import { IUserRepository } from 'src/domain/user/user-repository'
-import prisma from '../client/prisma-clilent'
+
 import { Injectable } from '@nestjs/common'
-import { UserDataDTO } from 'src/domain/user/user-dto'
+import { UserEntity, UserId } from 'src/domain/user/user-entity'
+import { UserFactory } from 'src/domain/user/user-factory'
+import { Email } from 'src/domain/common/email'
+import { prisma } from 'src/prisma'
 
 @Injectable()
 export class UserDataRepository implements IUserRepository {
-  public async save(saveUserData: UserDataDTO): Promise<void> {
-    try {
-      await prisma.user.create({ data: saveUserData })
-      // await prisma.user.create({
-      //   data: {
-      //     userId: userId.value,
-      //     userName: userName.value,
-      //     email: email.value,
-      //     status: status,
-      //     pairId: pairId == undefined ? null : pairId.value,
-      //     teamId: teamId == undefined ? null : teamId.value,
-      //     taskProgressId:
-      //       taskProgressId == undefined ? null : taskProgressId.value,
-      //   },
-      // })
-    } catch (error) {
-      throw error
-    }
-  }
-  public async findByEmail(email: string): Promise<UserDataDTO | undefined> {
-    try {
-      const userData = await prisma.user.findUnique({
-        where: { email: email },
+  public async save(saveUserEntity: UserEntity): Promise<void> {
+    const { userId, userName, email, status, pairId, teamId } =
+      saveUserEntity.getAllProperties()
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.user.findUnique({
+        where: { userId: userId.value },
       })
-      if (userData !== null) {
-        return new UserDataDTO({
-          ...userData,
-          pairId: userData.pairId ?? undefined,
-          teamId: userData.teamId ?? undefined,
-          taskProgressId: userData.taskProgressId ?? undefined,
+      if (result !== null) {
+        await tx.user.update({
+          where: { userId: userId.value },
+          data: {
+            userId: userId.value,
+            userName: userName.value,
+            email: email.value,
+            status: status,
+            pairId: pairId?.value,
+            teamId: teamId?.value,
+          },
         })
       } else {
-        throw new Error('Not Found.')
-      }
-    } catch (error) {
-      throw error
-    }
-  }
-
-  public async findByUserId(userId: string): Promise<UserDataDTO | undefined> {
-    try {
-      const userData = await prisma.user.findUnique({
-        where: { userId: userId },
-      })
-      if (userData !== null) {
-        return new UserDataDTO({
-          ...userData,
-          pairId: userData.pairId ?? undefined,
-          teamId: userData.teamId ?? undefined,
-          taskProgressId: userData.taskProgressId ?? undefined,
+        await tx.user.create({
+          data: {
+            userId: userId.value,
+            userName: userName.value,
+            email: email.value,
+            status: status,
+            pairId: pairId?.value,
+            teamId: teamId?.value,
+          },
         })
-      } else {
-        throw new Error('Not Found.')
       }
-    } catch (error) {
-      throw error
+    })
+  }
+  public async findByEmail(email: Email): Promise<UserEntity | undefined> {
+    const userData = await prisma.user.findUnique({
+      where: { email: email.value },
+    })
+    if (userData !== null) {
+      return UserFactory.create({
+        ...userData,
+        pairId: userData?.pairId !== null ? userData.pairId : undefined,
+        teamId: userData?.teamId !== null ? userData.teamId : undefined,
+      })
+    } else {
+      return undefined
     }
   }
 
-  public async exists(email: string): Promise<boolean> {
-    try {
-      const userData = await prisma.user.findUnique({
-        where: { email: email },
+  public async findByUserId(userId: UserId): Promise<UserEntity | undefined> {
+    const userData = await prisma.user.findUnique({
+      where: { userId: userId.value },
+    })
+    if (userData !== null) {
+      return UserFactory.create({
+        ...userData,
+        pairId: userData?.pairId !== null ? userData.pairId : undefined,
+        teamId: userData?.teamId !== null ? userData.teamId : undefined,
       })
-      if (userData) {
-        return true
-      } else {
-        return false
-      }
-    } catch (error) {
-      throw error
+    } else {
+      throw new Error('Not Found.')
     }
   }
 
-  public async update(
-    updateUserData: UserDataDTO,
-    userId: string,
-  ): Promise<void> {
-    try {
-      await prisma.user.update({
-        where: {
-          userId: userId,
-        },
-        data: {
-          userName: updateUserData.userName,
-          email: updateUserData.email,
-          status: updateUserData.status,
-        },
-      })
-    } catch (error) {
-      throw error
+  public async exists(email: Email): Promise<boolean> {
+    const userData = await prisma.user.findUnique({
+      where: { email: email.value },
+    })
+    if (userData) {
+      return true
+    } else {
+      return false
     }
   }
 }

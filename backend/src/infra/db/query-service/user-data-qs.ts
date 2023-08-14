@@ -1,7 +1,11 @@
-import { IUserDataQS } from 'src/app/query-service-interface/user-data-qs'
-import prisma from '../client/prisma-clilent'
+import {
+  IUserDataQS,
+  UserDataDTO,
+} from 'src/app/query-service-interface/user-data-qs'
+
 import { Injectable } from '@nestjs/common'
-import { UserDataDTO } from 'src/domain/user/user-dto'
+
+import { prisma } from 'src/prisma'
 
 @Injectable()
 export class UserDataQS implements IUserDataQS {
@@ -16,6 +20,8 @@ export class UserDataQS implements IUserDataQS {
           userName: user.userName,
           email: user.email,
           status: user.status,
+          pairId: user.pairId ?? undefined,
+          teamId: user.teamId ?? undefined,
         }),
     )
   }
@@ -28,6 +34,8 @@ export class UserDataQS implements IUserDataQS {
           userName: user.userName,
           email: user.email,
           status: user.status,
+          pairId: user.pairId ?? undefined,
+          teamId: user.teamId ?? undefined,
         }),
     )
   }

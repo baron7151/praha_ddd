@@ -4,15 +4,22 @@ export class TaskId extends BaseUuid {
   private type = 'TaskId'
 }
 export class TaskEntity {
-  private taskName: string
   private taskId: TaskId
-  private taskDetail: string
-  constructor(taskName: string, taskId: TaskId, taskDetail: string) {
+  private taskName: string
+  private taskContent: string
+  private taskCategory: string
+  constructor(
+    taskId: TaskId,
+    taskName: string,
+    taskContent: string,
+    taskCategory: string,
+  ) {
     this.taskName = taskName
     this.taskId = taskId
-    this.taskDetail = taskDetail
+    this.taskContent = taskContent
+    this.taskCategory = taskCategory
   }
-  equal(other: TaskEntity): boolean {
+  equals(other: TaskEntity): boolean {
     if (other == null || other == undefined) {
       return false
     }
@@ -20,5 +27,14 @@ export class TaskEntity {
       return false
     }
     return this.taskId.getId() === other.taskId.getId()
+  }
+
+  getAllProperties() {
+    return {
+      taskId: this.taskId,
+      taskName: this.taskName,
+      taskContent: this.taskContent,
+      taskCategory: this.taskCategory,
+    }
   }
 }

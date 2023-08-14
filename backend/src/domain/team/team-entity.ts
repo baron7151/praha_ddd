@@ -1,16 +1,28 @@
 import { BaseUuid } from '../common/base-uuid'
+import { DomainError } from '../common/domain-error'
+import { PairId } from '../pair/pair-entity'
+import { UserId } from '../user/user-entity'
 
 export class TeamId extends BaseUuid {
   private type = 'TeamId'
 }
 export class TeamEntity {
-  private teamName: TeamName
   private teamId: TeamId
-  constructor(teamName: TeamName, teamId: TeamId) {
-    this.teamName = teamName
+  private teamName: TeamName
+  private pairIds?: PairId[]
+  private userIds?: UserId[]
+  constructor(
+    teamId: TeamId,
+    teamName: TeamName,
+    pairIds?: PairId[],
+    userIds?: UserId[],
+  ) {
     this.teamId = teamId
+    this.teamName = teamName
+    this.pairIds = pairIds
+    this.userIds = userIds
   }
-  equal(other: TeamEntity): boolean {
+  equals(other: TeamEntity): boolean {
     if (other == null || other == undefined) {
       return false
     }
@@ -20,36 +32,42 @@ export class TeamEntity {
     return this.teamId.getId() === other.teamId.getId()
   }
   changeTeamName(teamName: TeamName): TeamEntity {
-    return new TeamEntity(teamName, this.teamId)
+    return new TeamEntity(this.teamId, teamName, this.pairIds, this.userIds)
+  }
+  getAllProperties() {
+    return {
+      teamId: this.teamId,
+      teamName: this.teamName,
+      pairIds: this?.pairIds,
+      userIds: this?.userIds,
+    }
+  }
+  static checkTeamUserCount(userIds?: UserId[]): boolean {
+    if (userIds === undefined) {
+      return true
+    } else if (userIds.length > 2) {
+      return true
+    } else {
+      return false
+    }
   }
 }
 
 export class TeamName {
-  private teamName: string
+  public readonly value: string
 
-  constructor(teamName: string) {
+  constructor(value: string) {
+    this.value = this.validate(value)
+  }
+  private validate(value: string) {
     const pattern = /^[0-9]+$/
-    if (!pattern.test(teamName)) {
-      throw new Error('Team Name must be numbers.')
-    } else if (teamName.length > 3 || teamName.length < 1) {
-      throw new Error(
+    if (!pattern.test(value)) {
+      throw new DomainError('Team Name must be numbers.')
+    } else if (value.length > 3 || value.length < 1) {
+      throw new DomainError(
         'Team names must be at least one and no more than three letters.',
       )
     }
-    this.teamName = teamName
-  }
-  changeTeamName(teamName: string): TeamName {
-    const pattern = /^[0-9]+$/
-    if (!pattern.test(teamName)) {
-      throw new Error('Team Name must be numbers.')
-    } else if (teamName.length > 3 || teamName.length < 1) {
-      throw new Error(
-        'Team names must be at least one and no more than three letters.',
-      )
-    }
-    return new TeamName(teamName)
-  }
-  getTeamName(): string {
-    return this.teamName
+    return value
   }
 }

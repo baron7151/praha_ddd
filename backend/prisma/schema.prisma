@@ -20,7 +20,46 @@ model User {
   userName String
   email String   @unique
   status String
+  pair Pair? @relation(fields: [pairId], references: [pairId], onDelete: SetNull, onUpdate: SetNull)
   pairId String?
+  team Team? @relation(fields: [teamId], references: [teamId], onDelete: SetNull, onUpdate: SetNull)
   teamId String?
-  taskProgressId String?
+  taskProgress TaskProgress[]
+}
+
+model Pair {
+  id Int @id @default(autoincrement())
+  pairId String @unique
+  pairName String @unique
+  user User[]
+  team Team? @relation(fields: [teamId], references: [teamId], onDelete: SetNull, onUpdate: SetNull)
+  teamId String?
+}
+
+model Team {
+  id Int @id @default(autoincrement())
+  teamId String @unique
+  teamName String @unique
+  pair Pair[]
+  user User[]
+}
+
+model TaskProgress {
+  id Int @id @default(autoincrement())
+  taskProgressId String @unique
+  taskStatus String
+  task Task @relation(fields: [taskId], references: [taskId], onDelete: Cascade, onUpdate: Cascade)
+  taskId String
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+  @@unique([taskId, userId], name: "task_progress_identifier")
+}
+
+model Task {
+  id Int @id @default(autoincrement())
+  taskId String @unique
+  taskName String
+  taskContent String
+  taskCategory String
+  TaskProgress TaskProgress[]
 }

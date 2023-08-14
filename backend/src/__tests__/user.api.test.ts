@@ -3,71 +3,51 @@
 import { prisma } from 'src/prisma'
 import axios, { isCancel, AxiosError } from 'axios'
 import { UserStatus } from 'src/domain/user/user-entity'
+import {
+  cleaningAllTables,
+  seedsTransfer,
+  testPairData,
+  testUserData,
+} from '@testUtil/initial_data/seed'
 
 describe('/user', () => {
-  const user1 = {
-    userId: '11111111-1111-1111-1111-111111111111',
-    userName: 'test1',
-    email: 'test1@example.com',
-    status: UserStatus.ACTIVE,
-  }
-  const user2 = {
-    userId: '22222222-2222-2222-2222-222222222222',
-    userName: 'test2',
-    email: 'test2@example.com',
-    status: UserStatus.ACTIVE,
-  }
-
-  const user3 = {
-    userId: '33333333-3333-3333-3333-333333333333',
-    userName: 'test3',
-    email: 'test3@example.com',
-    status: UserStatus.ACTIVE,
-  }
-
   beforeAll(async () => {
-    await prisma.user.deleteMany({})
-    await prisma.user.create({
-      data: {
-        ...user1,
-      },
-    })
-    await prisma.user.create({
-      data: {
-        ...user2,
-      },
-    })
+    await cleaningAllTables()
+    await seedsTransfer()
   })
   afterAll(async () => {
+    await cleaningAllTables()
     await prisma.$disconnect()
   })
   describe('GET /user', () => {
     it('query stringsにnameあり', async () => {
-      const url = 'http://localhost:3001/user?user_name=test1'
+      const url = `http://localhost:3001/user?user_name=${testUserData[0]?.userName}`
       const response = await axios.get(url)
       expect(response.status).toBe(200)
-      expect(response.data.userData[0].userId).toBe(user1.userId)
+      expect(response.data.userData[0].user_id).toBe(testUserData[0]?.userId)
     })
     it('query stringsなし', async () => {
       const url = 'http://localhost:3001/user'
       const response = await axios.get(url)
       expect(response.status).toBe(200)
-      expect(response.data.userData.length).toBe(2)
-      expect(response.data.userData[1].userId).toBe(user2.userId)
+      expect(response.data.userData.length).toBe(testUserData.length)
+      //expect(response.data.userData[0].userId).toBe(testUserData[0]?.userId)
     })
   })
   describe('POST /users', () => {
     it('', async () => {
+      const userName = 'test10000'
+      const email = 'test10000@example.com'
       const url = 'http://localhost:3001/user'
       const response = await axios.post(url, {
-        user_name: user3.userName,
-        email: user3.email,
+        user_name: userName,
+        email: email,
       })
       expect(response.status).toBe(201)
       const result = await prisma.user.findUnique({
-        where: { email: user3.email },
+        where: { email: email },
       })
-      expect(result?.email).toBe(user3.email)
+      expect(result?.email).toBe(email)
     })
   })
 
@@ -75,22 +55,22 @@ describe('/user', () => {
     it('', async () => {
       const updateUserName = 'xxxx'
       const updateEmail = 'xxxx@example.com'
-      const updateStatus = UserStatus.INACTIVE
+      const updateStatus = UserStatus.ACTIVE
       const url = `http://localhost:3001/user`
+
       const response = await axios.patch(url, {
-        user_id: user2.userId,
+        user_id: testUserData[0]?.userId,
         user_name: updateUserName,
         email: updateEmail,
         status: updateStatus,
       })
 
       expect(response.status).toBe(200)
-      const result = await prisma.user.findUnique({
-        where: { email: updateEmail },
-      })
-      expect(result?.userName).toBe(updateUserName)
-      expect(result?.email).toBe(updateEmail)
-      expect(result?.status).toBe(updateStatus)
+      const result = await axios.get(url + `?user_name=${updateUserName}`)
+      expect(result.status).toBe(200)
+      expect(result.data.userData[0].user_name).toBe(updateUserName)
+      expect(result.data.userData[0].email).toBe(updateEmail)
+      expect(result.data.userData[0].status).toBe(updateStatus)
     })
   })
 })

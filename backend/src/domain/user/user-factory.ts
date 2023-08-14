@@ -4,40 +4,42 @@ import { IUserRepository } from './user-repository'
 import { Inject, Injectable } from '@nestjs/common'
 import { Providers } from 'src/providers'
 import { Email } from '../common/email'
-import { TaskProgressId } from '../task/task-progress-entity'
 import { PairId } from '../pair/pair-entity'
 import { TeamId } from '../team/team-entity'
+import { DomainError } from '../common/domain-error'
 
 @Injectable()
 export class UserFactory {
   constructor(
     @Inject(Providers.IUserRepository)
-    private userReposigory: IUserRepository,
+    private userRepository: IUserRepository,
   ) {}
-  public async addUser(name: string, email: string): Promise<UserEntity> {
+  public async addUser(userName: string, email: string): Promise<UserEntity> {
     const userId = new UserId(uuid())
-    const userName = new UserName(name)
-    const userEmail = new Email(email)
     const userStatus = UserStatus.ACTIVE
-    try {
-      const duplicateEmailCheck = await this.userReposigory.exists(email)
-      if (duplicateEmailCheck) {
-        throw new Error(`This Email is already registered. ${email}`)
-      }
-    } catch (error) {
-      throw error
+
+    const duplicateEmailCheck = await this.userRepository.exists(
+      new Email(email),
+    )
+    if (duplicateEmailCheck) {
+      throw new DomainError(`This Email is already registered. ${email}`)
     }
-    return new UserEntity(userId, userName, userEmail, userStatus)
+    return new UserEntity(
+      userId,
+      new UserName(userName),
+      new Email(email),
+      userStatus,
+    )
   }
-  static create(
-    userId: string,
-    userName: string,
-    email: string,
-    status: string,
-    taskProgressId?: string,
-    pairId?: string,
-    teamId?: string,
-  ): UserEntity {
+  static create(props: {
+    userId: string
+    userName: string
+    email: string
+    status: string
+    pairId?: string
+    teamId?: string
+  }): UserEntity {
+    const { userId, userName, email, status, pairId, teamId } = props
     return new UserEntity(
       new UserId(userId),
       new UserName(userName),
@@ -45,35 +47,52 @@ export class UserFactory {
       status as UserStatus,
       pairId === undefined ? undefined : new PairId(pairId),
       teamId === undefined ? undefined : new TeamId(teamId),
-      taskProgressId === undefined
-        ? undefined
-        : new TaskProgressId(taskProgressId),
     )
   }
 
-  static reconstruct(
-    userEntity: UserEntity,
-    newUserName?: string,
-    newEmail?: string,
-    newStatus?: string,
-    newPairId?: string,
-    newTeamId?: string,
-    newTaskProgressId?: string,
-  ): UserEntity {
-    const { userId, userName, email, status, pairId, teamId, taskProgressId } =
+  public async reconstruct(props: {
+    userEntity: UserEntity
+    newUserName?: string
+    newEmail?: string
+    newStatus?: string
+    newPairId?: string
+    newTeamId?: string
+  }): Promise<UserEntity> {
+    const {
+      userEntity,
+      newUserName,
+      newEmail,
+      newStatus,
+      newPairId,
+      newTeamId,
+    } = props
+    const { userId, userName, email, status, pairId, teamId } =
       userEntity.getAllProperties()
+    if (newEmail) {
+      const duplicateEmailCheck = await this.userRepository.exists(
+        new Email(newEmail),
+      )
+      if (duplicateEmailCheck) {
+        throw new DomainError(`This Email is already registered. ${email}`)
+      }
+    }
     return new UserEntity(
-      new UserId(userId),
+      new UserId(userId.value),
       newUserName === undefined
-        ? new UserName(userName)
+        ? new UserName(userName.value)
         : new UserName(newUserName),
-      newEmail === undefined ? new Email(email) : new Email(newEmail),
+      newEmail === undefined ? new Email(email.value) : new Email(newEmail),
       newStatus === undefined ? status : (newStatus as UserStatus),
-      newPairId === undefined ? new PairId(pairId) : new PairId(newPairId),
-      newTeamId === undefined ? new TeamId(teamId) : new TeamId(newTeamId),
-      newTaskProgressId === undefined
-        ? new TaskProgressId(taskProgressId)
-        : new TaskProgressId(newTaskProgressId),
+      newPairId === undefined
+        ? pairId === undefined
+          ? undefined
+          : new PairId(pairId.value)
+        : new PairId(newPairId),
+      newTeamId === undefined
+        ? teamId === undefined
+          ? undefined
+          : new TeamId(teamId.value)
+        : new TeamId(newTeamId),
     )
   }
 }

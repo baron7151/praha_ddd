@@ -1,10 +1,7 @@
 import { Email } from '../common/email'
 import { BaseUuid } from '../common/base-uuid'
-import {
-  TaskProgressEntity,
-  TaskProgressId,
-} from '../task/task-progress-entity'
 import { PairId } from '../pair/pair-entity'
+import { DomainError } from '../common/domain-error'
 import { TeamId } from '../team/team-entity'
 
 export enum UserStatus {
@@ -41,7 +38,6 @@ export class UserEntity {
   private status: UserStatus
   private pairId?: PairId
   private teamId?: TeamId
-  private taskProgressId?: TaskProgressId
   constructor(
     userId: UserId,
     userName: UserName,
@@ -49,15 +45,18 @@ export class UserEntity {
     status: UserStatus,
     pairId?: PairId,
     teamId?: TeamId,
-    taskProgressId?: TaskProgressId,
   ) {
+    if (UserEntity.checkUserStatusAndPairAndTeam(status, pairId, teamId)) {
+      throw new DomainError(
+        'ステータスが「在籍中」ではない場合、どのチームにもペアにも所属できません。',
+      )
+    }
     this.userId = userId
     this.userName = userName
     this.email = email
     this.status = status
     this.pairId = pairId
     this.teamId = teamId
-    this.taskProgressId = taskProgressId
   }
   equals(other: UserEntity): boolean {
     if (other === null || other === undefined) {
@@ -71,13 +70,12 @@ export class UserEntity {
   }
   getAllProperties() {
     return {
-      userId: this.userId.value,
-      userName: this.userName.value,
-      email: this.email.value,
+      userId: this.userId,
+      userName: this.userName,
+      email: this.email,
       status: this.status,
-      pairId: this.pairId?.value,
-      teamId: this.teamId?.value,
-      taskProgressId: this.taskProgressId?.value,
+      pairId: this.pairId,
+      teamId: this.teamId,
     }
   }
   canJoin(): boolean {
@@ -88,15 +86,23 @@ export class UserEntity {
     }
   }
   changeStatus(status: UserStatus): UserEntity {
-    return new UserEntity(
-      this.userId,
-      this.userName,
-      this.email,
-      status,
-      this.pairId,
-      this.teamId,
-      this.taskProgressId,
-    )
+    switch (status) {
+      case UserStatus.ACTIVE:
+        return new UserEntity(
+          this.userId,
+          this.userName,
+          this.email,
+          status,
+          this.pairId,
+          this.teamId,
+        )
+      case UserStatus.INACTIVE:
+        return new UserEntity(this.userId, this.userName, this.email, status)
+      case UserStatus.DELETE:
+        return new UserEntity(this.userId, this.userName, this.email, status)
+      default:
+        throw new DomainError('Something is wrong.')
+    }
   }
   changeUserName(userName: UserName): UserEntity {
     return new UserEntity(
@@ -106,7 +112,30 @@ export class UserEntity {
       this.status,
       this.pairId,
       this.teamId,
-      this.taskProgressId,
     )
+  }
+  changeEmail(email: Email): UserEntity {
+    return new UserEntity(
+      this.userId,
+      this.userName,
+      email,
+      this.status,
+      this.pairId,
+      this.teamId,
+    )
+  }
+  static checkUserStatusAndPairAndTeam(
+    status: UserStatus,
+    pairId?: PairId,
+    teamId?: TeamId,
+  ): boolean {
+    if (
+      (status === UserStatus.INACTIVE || status === UserStatus.DELETE) &&
+      (pairId !== undefined || teamId !== undefined)
+    ) {
+      return true
+    } else {
+      return false
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { UserDataDTO } from 'src/domain/user/user-dto'
+import { UserDataDTO } from 'src/app/query-service-interface/user-data-qs'
 
 export class GetUserDataResponse {
   @ApiProperty({ type: () => [UserData] })
@@ -7,20 +7,24 @@ export class GetUserDataResponse {
 
   public constructor(params: { userDatas: UserDataDTO[] }) {
     const { userDatas } = params
-    this.userData = userDatas.map(({ userId, userName, email, status }) => {
-      return new UserData({
-        userId,
-        user_name: userName,
-        email,
-        status,
-      })
-    })
+    this.userData = userDatas.map(
+      ({ userId, userName, email, status, pairId, teamId }) => {
+        return new UserData({
+          user_id: userId,
+          user_name: userName,
+          email,
+          status,
+          pair_id: pairId,
+          team_id: teamId,
+        })
+      },
+    )
   }
 }
 
 export class UserData {
   @ApiProperty()
-  userId: string
+  user_id: string
 
   @ApiProperty()
   user_name: string
@@ -31,15 +35,25 @@ export class UserData {
   @ApiProperty()
   status: string
 
+  @ApiProperty()
+  pair_id?: string
+
+  @ApiProperty()
+  team_id?: string
+
   public constructor(params: {
-    userId: string
+    user_id: string
     user_name: string
     email: string
     status: string
+    pair_id?: string
+    team_id?: string
   }) {
-    this.userId = params.userId
+    this.user_id = params.user_id
     this.user_name = params.user_name
     this.email = params.email
     this.status = params.status
+    this.pair_id = params.pair_id
+    this.team_id = params.team_id
   }
 }

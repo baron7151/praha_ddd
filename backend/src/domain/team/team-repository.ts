@@ -2,7 +2,7 @@ import { Email } from '../common/email'
 import { TeamEntity, TeamId, TeamName } from './team-entity'
 
 export interface ITeamRepository {
-  find(teamId: TeamId): TeamEntity
-  save(team: TeamEntity): void
-  exists(teamName: TeamName): boolean
+  findByTeamId(teamId: TeamId): Promise<TeamEntity | undefined>
+  save(team: TeamEntity): Promise<void>
+  exists(teamName: TeamName): Promise<boolean>
 }
