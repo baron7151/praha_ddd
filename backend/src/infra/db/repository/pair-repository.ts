@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { PairEntity, PairId, PairName } from 'src/domain/pair/pair-entity'
 import { UserId } from 'src/domain/user/user-entity'
 import { prisma } from 'src/prisma'
+import { TeamId } from 'src/domain/team/team-entity'
 
 @Injectable()
 export class PairRepository implements IPairRepository {
@@ -70,6 +71,24 @@ export class PairRepository implements IPairRepository {
       return true
     } else {
       return false
+    }
+  }
+  public async findByTeamId(teamId: TeamId): Promise<PairEntity[] | undefined> {
+    const pairDatas = await prisma.pair.findMany({
+      where: { teamId: teamId.value },
+      include: { user: true },
+    })
+    if (pairDatas !== null) {
+      return pairDatas.map((pairData) =>
+        PairEntity.create({
+          pairId: pairData.pairId,
+          pairName: pairData.pairName,
+          teamId: pairData.teamId,
+          userIds: pairData.user.map((user) => user.userId),
+        }),
+      )
+    } else {
+      return undefined
     }
   }
 }

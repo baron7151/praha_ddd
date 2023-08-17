@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { PairId } from 'src/domain/pair/pair-entity'
 import { TeamEntity, TeamId, TeamName } from 'src/domain/team/team-entity'
 import { ITeamRepository } from 'src/domain/team/team-repository'
+import { UserId } from 'src/domain/user/user-entity'
 import { prisma } from 'src/prisma'
 
 @Injectable()
@@ -45,13 +46,14 @@ export class TeamRepository implements ITeamRepository {
   public async findByTeamId(teamId: TeamId): Promise<TeamEntity | undefined> {
     const teamData = await prisma.team.findUnique({
       where: { teamId: teamId.value },
-      include: { pair: true },
+      include: { pair: true, user: true },
     })
     if (teamData !== null) {
       return new TeamEntity(
         new TeamId(teamData.teamId),
         new TeamName(teamData.teamName),
         teamData.pair.map(({ pairId }) => new PairId(pairId)),
+        teamData.user.map(({ userId }) => new UserId(userId)),
       )
     } else {
       return undefined
@@ -66,6 +68,24 @@ export class TeamRepository implements ITeamRepository {
       return true
     } else {
       return false
+    }
+  }
+  public async findAllTeam(): Promise<TeamEntity[] | undefined> {
+    const teamDatas = await prisma.team.findMany({
+      include: { pair: true, user: true },
+    })
+    if (teamDatas !== null) {
+      return teamDatas.map(
+        (teamData) =>
+          new TeamEntity(
+            new TeamId(teamData.teamId),
+            new TeamName(teamData.teamName),
+            teamData.pair.map(({ pairId }) => new PairId(pairId)),
+            teamData.user.map(({ userId }) => new UserId(userId)),
+          ),
+      )
+    } else {
+      return undefined
     }
   }
 }

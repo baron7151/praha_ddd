@@ -138,4 +138,24 @@ export class UserEntity {
       return false
     }
   }
+  changePair(changePairId: PairId): UserEntity {
+    return new UserEntity(
+      this.userId,
+      this.userName,
+      this.email,
+      this.status,
+      changePairId,
+      this.teamId,
+    )
+  }
+  changeTeam(changeTeamId: TeamId): UserEntity {
+    return new UserEntity(
+      this.userId,
+      this.userName,
+      this.email,
+      this.status,
+      this.pairId,
+      changeTeamId,
+    )
+  }
 }

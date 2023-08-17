@@ -4,6 +4,10 @@ import { TeamId } from '../team/team-entity'
 import { UserId } from '../user/user-entity'
 import { DomainError } from '../common/domain-error'
 
+export const MIN_PAIR_USER = 2
+export const MAX_PAIR_USER = 3
+export const PAIR_NAME_WORD_COUNT = 1
+
 export class PairId extends BaseUuid {
   private type = 'PairId'
 }
@@ -52,7 +56,10 @@ export class PairEntity {
   static checkPairUserCount(userIds?: UserId[]): boolean {
     if (userIds === undefined) {
       return true
-    } else if (userIds.length < 2 || userIds.length > 3) {
+    } else if (
+      userIds.length < MIN_PAIR_USER ||
+      userIds.length > MAX_PAIR_USER
+    ) {
       return false
     } else {
       return true
@@ -93,6 +100,9 @@ export class PairEntity {
       userIds != null ? userIds.map((userId) => new UserId(userId)) : undefined,
     )
   }
+  changeTeam(teamId: TeamId) {
+    return new PairEntity(this.pairId, this.pairName, teamId, this.userIds)
+  }
 }
 
 export class PairName {
@@ -105,9 +115,24 @@ export class PairName {
     const pattern = /^[a-zA-Z]+$/
     if (!pattern.test(value)) {
       throw new Error('Pair Name must be alphabet.')
-    } else if (value.length != 1) {
+    } else if (value.length != PAIR_NAME_WORD_COUNT) {
       throw new Error('Pair names must be one letter.')
     }
     return value
+  }
+  public static getRandomPairName(): PairName {
+    const characters = 'abcdefghijklmnopqrstuvwxyz'
+    const randomIndex = Math.floor(Math.random() * characters.length)
+    const randomCharacter = characters[randomIndex]
+
+    // Randomly decide whether to return upper or lower case
+    const isUpperCase = Math.random() < 0.5
+    if (randomCharacter !== undefined) {
+      return isUpperCase
+        ? new PairName(randomCharacter.toUpperCase())
+        : new PairName(randomCharacter)
+    } else {
+      throw new DomainError('Failed to generate random pairName.')
+    }
   }
 }
