@@ -9,18 +9,16 @@ export class TeamService {
     private teamRepository: ITeamRepository,
   ) {}
   async findMostFewMemberTeam(): Promise<TeamEntity | undefined> {
-    const allTeamEntitys = await this.teamRepository.findAllTeam()
+    let minUserCount = 0
+    let userCount = 0
+    let mostFewMemeberTeam: TeamEntity | undefined
+    const allTeamEntitys = await this.teamRepository.findAllTeams()
     if (allTeamEntitys !== undefined) {
-      let minUserCount = 0
-      let userCount = 0
-      let mostFewMemeberTeam: TeamEntity | undefined
       allTeamEntitys.forEach((teamEntity) => {
-        if (teamEntity.getAllProperties().userIds?.length !== undefined) {
-          userCount = teamEntity.getAllProperties().userIds!.length
-          if (userCount < minUserCount || minUserCount === 0) {
-            minUserCount = userCount
-            mostFewMemeberTeam = teamEntity
-          }
+        userCount = teamEntity.countTeamUser()
+        if (userCount < minUserCount || minUserCount === 0) {
+          minUserCount = userCount
+          mostFewMemeberTeam = teamEntity
         }
       })
       if (minUserCount === 0) {

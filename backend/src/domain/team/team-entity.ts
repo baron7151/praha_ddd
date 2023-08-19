@@ -1,7 +1,10 @@
+import { MIN_DATE } from 'class-validator'
 import { BaseUuid } from '../common/base-uuid'
 import { DomainError } from '../common/domain-error'
 import { PairId } from '../pair/pair-entity'
 import { UserId } from '../user/user-entity'
+
+export const MIN_TEAM_USER = 3
 
 export class TeamId extends BaseUuid {
   private type = 'TeamId'
@@ -46,6 +49,26 @@ export class TeamEntity {
     if (userIds === undefined) {
       return true
     } else if (userIds.length > 2) {
+      return true
+    } else {
+      return false
+    }
+  }
+  countTeamUser(): number {
+    if (this.userIds !== undefined) {
+      return this.userIds.length
+    } else {
+      return 0
+    }
+  }
+  getId(): TeamId {
+    return this.teamId
+  }
+  isMinimumMember(): boolean {
+    if (
+      this.userIds?.length !== undefined &&
+      this.userIds!.length <= MIN_TEAM_USER
+    ) {
       return true
     } else {
       return false

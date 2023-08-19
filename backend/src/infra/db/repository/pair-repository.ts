@@ -4,6 +4,7 @@ import { PairEntity, PairId, PairName } from 'src/domain/pair/pair-entity'
 import { UserId } from 'src/domain/user/user-entity'
 import { prisma } from 'src/prisma'
 import { TeamId } from 'src/domain/team/team-entity'
+import { PairService } from 'src/domain/pair/pair-service'
 
 @Injectable()
 export class PairRepository implements IPairRepository {

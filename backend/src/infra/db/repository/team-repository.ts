@@ -70,7 +70,7 @@ export class TeamRepository implements ITeamRepository {
       return false
     }
   }
-  public async findAllTeam(): Promise<TeamEntity[] | undefined> {
+  public async findAllTeams(): Promise<TeamEntity[] | undefined> {
     const teamDatas = await prisma.team.findMany({
       include: { pair: true, user: true },
     })

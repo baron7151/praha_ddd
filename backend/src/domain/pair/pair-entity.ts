@@ -103,6 +103,58 @@ export class PairEntity {
   changeTeam(teamId: TeamId) {
     return new PairEntity(this.pairId, this.pairName, teamId, this.userIds)
   }
+  isMinimumMember(): boolean {
+    if (
+      this.userIds?.length !== undefined &&
+      this.userIds!.length <= MIN_PAIR_USER
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
+  isMaximumMember(): boolean {
+    if (
+      this.userIds?.length !== undefined &&
+      this.userIds.length >= MAX_PAIR_USER
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
+  isMoveablePair(): boolean {
+    if (this.userIds !== undefined && this.userIds!.length < MAX_PAIR_USER) {
+      return true
+    } else {
+      return false
+    }
+  }
+  isPairMemberExists(): boolean {
+    return this.userIds !== undefined ? true : false
+  }
+  countPairMemer(): number {
+    if (this.userIds !== undefined) {
+      return this.userIds.length
+    } else {
+      return 0
+    }
+  }
+  selectUserAtRandom(): UserId | undefined {
+    if (this.userIds !== undefined) {
+      const randomIndex = Math.floor(Math.random() * this.userIds.length)
+      return this.userIds[randomIndex] as UserId
+    } else {
+      return undefined
+    }
+  }
+  isBelongingToTeam(): boolean {
+    if (this.teamId !== undefined) {
+      return true
+    } else {
+      return false
+    }
+  }
 }
 
 export class PairName {

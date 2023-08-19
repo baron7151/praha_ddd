@@ -5,7 +5,7 @@ import {
   UserName,
   UserStatus,
 } from 'src/domain/user/user-entity'
-import { UserDataRepository } from '../../repository/user-data-repository'
+import { UserDataRepository } from '../../repository/user-repository'
 
 import { uuid } from 'uuidv4'
 

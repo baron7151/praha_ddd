@@ -5,5 +5,5 @@ export interface ITeamRepository {
   findByTeamId(teamId: TeamId): Promise<TeamEntity | undefined>
   save(team: TeamEntity): Promise<void>
   exists(teamName: TeamName): Promise<boolean>
-  findAllTeam(): Promise<TeamEntity[] | undefined>
+  findAllTeams(): Promise<TeamEntity[] | undefined>
 }

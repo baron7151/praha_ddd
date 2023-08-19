@@ -158,4 +158,7 @@ export class UserEntity {
       changeTeamId,
     )
   }
+  static isStringInUserStatus(inputString: string): boolean {
+    return Object.values(UserStatus as any).includes(inputString)
+  }
 }

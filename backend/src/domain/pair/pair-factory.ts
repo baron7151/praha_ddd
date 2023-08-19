@@ -88,4 +88,7 @@ export class PairFactory {
         : newUserIds.map((userId) => new UserId(userId)),
     )
   }
+  public async register(pairEntity: PairEntity) {
+    await this.pairRepository.save(pairEntity)
+  }
 }

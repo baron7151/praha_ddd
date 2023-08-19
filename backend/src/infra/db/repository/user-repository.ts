@@ -5,9 +5,12 @@ import { UserEntity, UserId } from 'src/domain/user/user-entity'
 import { UserFactory } from 'src/domain/user/user-factory'
 import { Email } from 'src/domain/common/email'
 import { prisma } from 'src/prisma'
+import { TeamId } from 'src/domain/team/team-entity'
+import { PairId } from 'src/domain/pair/pair-entity'
+import { User } from '@prisma/client'
 
 @Injectable()
-export class UserDataRepository implements IUserRepository {
+export class UserRepository implements IUserRepository {
   public async save(saveUserEntity: UserEntity): Promise<void> {
     const { userId, userName, email, status, pairId, teamId } =
       saveUserEntity.getAllProperties()
@@ -67,7 +70,65 @@ export class UserDataRepository implements IUserRepository {
         teamId: userData?.teamId !== null ? userData.teamId : undefined,
       })
     } else {
-      throw new Error('Not Found.')
+      return undefined
+    }
+  }
+
+  public async findByManyUserIds(
+    userIds: UserId[],
+  ): Promise<UserEntity[] | undefined> {
+    const userDatas = (
+      await Promise.all(
+        userIds.map((userId) =>
+          prisma.user.findUnique({
+            where: { userId: userId.value },
+          }),
+        ),
+      )
+    ).filter((item: User | null): item is User => item !== null)
+    if (userDatas.length !== 0) {
+      return userDatas.map((userData) => {
+        return UserFactory.create({
+          ...userData,
+          pairId: userData?.pairId !== null ? userData.pairId : undefined,
+          teamId: userData?.teamId !== null ? userData.teamId : undefined,
+        })
+      })
+    } else {
+      return undefined
+    }
+  }
+  public async findByTeamId(teamId: TeamId): Promise<UserEntity[] | undefined> {
+    const userDatas = await prisma.user.findMany({
+      where: { teamId: teamId.value },
+    })
+    if (userDatas !== null) {
+      return userDatas.map((userData) => {
+        return UserFactory.create({
+          ...userData,
+          pairId: userData?.pairId !== null ? userData.pairId : undefined,
+          teamId: userData?.teamId !== null ? userData.teamId : undefined,
+        })
+      })
+    } else {
+      return undefined
+    }
+  }
+
+  public async findByPairId(pairId: PairId): Promise<UserEntity[] | undefined> {
+    const userDatas = await prisma.user.findMany({
+      where: { pairId: pairId.value },
+    })
+    if (userDatas !== null) {
+      return userDatas.map((userData) => {
+        return UserFactory.create({
+          ...userData,
+          pairId: userData?.pairId !== null ? userData.pairId : undefined,
+          teamId: userData?.teamId !== null ? userData.teamId : undefined,
+        })
+      })
+    } else {
+      return undefined
     }
   }
 
