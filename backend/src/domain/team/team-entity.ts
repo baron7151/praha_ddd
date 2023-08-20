@@ -12,8 +12,8 @@ export class TeamId extends BaseUuid {
 export class TeamEntity {
   private teamId: TeamId
   private teamName: TeamName
-  private pairIds?: PairId[]
-  private userIds?: UserId[]
+  private readonly pairIds?: PairId[]
+  private readonly userIds?: UserId[]
   constructor(
     teamId: TeamId,
     teamName: TeamName,

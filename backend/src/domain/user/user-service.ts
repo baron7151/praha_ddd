@@ -11,14 +11,7 @@ import { PairService } from '../pair/pair-service'
 import { TeamService } from '../team/team-service'
 
 export class UserService {
-  constructor(
-    @Inject(Providers.ITeamRepository)
-    private teamRepository: ITeamRepository,
-    @Inject(Providers.IUserRepository) private userRepository: IUserRepository,
-    @Inject(Providers.IPairRepository) private pairRepository: IPairRepository,
-    @Inject(PairService) private pairService: PairService,
-    @Inject(TeamService) private teamService: TeamService,
-  ) {}
+  constructor() {}
   // async changeUserStatus(userEntity: UserEntity, newStatus: UserStatus) {
   //   const { userId, userName, email, status, pairId, teamId } =
   //     userEntity.getAllProperties()

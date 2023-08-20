@@ -41,47 +41,21 @@ describe('PairEntity', () => {
       expect(result).toBe(true)
     })
   })
-
-  describe('removePairUser', () => {
-    it('should return a new PairEntity instance with the specified user removed', () => {
-      const pairEntity = new PairEntity(pairId, pairName, teamId, userIds)
-      const updatedPairEntity = pairEntity.removePairUser(userId3)
-
-      expect(updatedPairEntity).toBeInstanceOf(PairEntity)
-      expect(updatedPairEntity.getAllProperties().userIds?.length).toEqual(2)
-    })
-  })
-
-  describe('addPairUser', () => {
-    it('should return a new PairEntity instance with the specified user added', () => {
-      const pairEntity = new PairEntity(
-        pairId,
-        pairName,
-        teamId,
-        userIds.slice(1, 3),
-      )
-      const updatedPairEntity = pairEntity.addPairUser(userId3)
-
-      expect(updatedPairEntity).toBeInstanceOf(PairEntity)
-      expect(updatedPairEntity.getAllProperties().userIds?.length).toEqual(3)
-    })
-  })
-})
-
-describe('PairName', () => {
-  describe('constructor', () => {
-    it('should return a new PairName instance', () => {
-      const pairName = new PairName('A')
-      expect(pairName).toBeInstanceOf(PairName)
-      expect(pairName.value).toBe('A')
-    })
-    it('should throw an error', () => {
-      expect(() => new PairName('1')).toThrowError(
-        'Pair Name must be alphabet.',
-      )
-      expect(() => new PairName('aa')).toThrowError(
-        'Pair names must be one letter.',
-      )
+  describe('PairName', () => {
+    describe('constructor', () => {
+      it('should return a new PairName instance', () => {
+        const pairName = new PairName('A')
+        expect(pairName).toBeInstanceOf(PairName)
+        expect(pairName.value).toBe('A')
+      })
+      it('should throw an error', () => {
+        expect(() => new PairName('1')).toThrowError(
+          'Pair Name must be alphabet.',
+        )
+        expect(() => new PairName('aa')).toThrowError(
+          'Pair names must be one letter.',
+        )
+      })
     })
   })
 })

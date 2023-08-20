@@ -4,7 +4,7 @@ import { UserController } from './controller/user.controller'
 import { UserDataQS } from './infra/db/query-service/user-data-qs'
 import { GetUserDataUseCase } from './app/user/get-user-data-usecase'
 import { Providers } from './providers'
-import { UserDataRepository } from './infra/db/repository/user-repository'
+import { UserRepository } from './infra/db/repository/user-repository'
 import { UserFactory } from './domain/user/user-factory'
 import { PostUserDataUseCase } from './app/user/post-user-data-usecase'
 import { PatchUserDataUseCase } from './app/user/patch-user-data-usecase'
@@ -44,7 +44,7 @@ import { PairFactory } from './domain/pair/pair-factory'
     },
     {
       provide: Providers.IUserRepository,
-      useClass: UserDataRepository,
+      useClass: UserRepository,
     },
     {
       provide: Providers.IPairRepository,

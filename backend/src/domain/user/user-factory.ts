@@ -36,8 +36,8 @@ export class UserFactory {
     userName: string
     email: string
     status: string
-    pairId?: string
-    teamId?: string
+    pairId?: string | null
+    teamId?: string | null
   }): UserEntity {
     const { userId, userName, email, status, pairId, teamId } = props
     return new UserEntity(
@@ -45,8 +45,8 @@ export class UserFactory {
       new UserName(userName),
       new Email(email),
       status as UserStatus,
-      pairId === undefined ? undefined : new PairId(pairId),
-      teamId === undefined ? undefined : new TeamId(teamId),
+      pairId == undefined ? undefined : new PairId(pairId),
+      teamId == undefined ? undefined : new TeamId(teamId),
     )
   }
 

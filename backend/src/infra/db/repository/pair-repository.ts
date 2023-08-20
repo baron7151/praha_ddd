@@ -9,27 +9,13 @@ import { PairService } from 'src/domain/pair/pair-service'
 @Injectable()
 export class PairRepository implements IPairRepository {
   public async save(savePairEntity: PairEntity): Promise<void> {
-    const { pairId, pairName, teamId, userIds } =
-      savePairEntity.getAllProperties()
+    const { pairId, pairName, teamId } = savePairEntity.getAllProperties()
     const pairData = {
       pairId: pairId.value,
       pairName: pairName.value,
       teamId: teamId?.value,
-      ...(userIds !== undefined && {
-        user: {
-          connect: userIds.map((userId) => ({ userId: userId.value })),
-        },
-      }),
     }
     await prisma.$transaction(async (tx) => {
-      if (userIds !== undefined) {
-        const user = await tx.user.findMany({
-          where: { userId: { in: userIds.map((userId) => userId.value) } },
-        })
-        if (user.length !== userIds.length) {
-          throw new Error('do not found userId')
-        }
-      }
       const result = await tx.pair.findUnique({
         where: { pairId: pairId.value },
       })
@@ -40,8 +26,13 @@ export class PairRepository implements IPairRepository {
           },
         })
       } else {
-        await tx.pair.delete({ where: { pairId: pairId.value } })
-        await tx.pair.create({ data: { ...pairData } })
+        await tx.pair.update({
+          where: { pairId: pairId.value },
+          data: {
+            pairName: pairName.value,
+            teamId: teamId !== undefined ? teamId.value : null,
+          },
+        })
       }
     })
   }
@@ -56,11 +47,13 @@ export class PairRepository implements IPairRepository {
         pairId: pairData.pairId,
         pairName: pairData.pairName,
         teamId: pairData.teamId,
-        userIds: pairData.user.map((user) => user.userId),
+        userIds:
+          pairData.user !== undefined
+            ? pairData.user.map((user) => user.userId)
+            : undefined,
       })
     } else {
       return undefined
-      //throw new Error('Not Found.')
     }
   }
 
@@ -85,7 +78,10 @@ export class PairRepository implements IPairRepository {
           pairId: pairData.pairId,
           pairName: pairData.pairName,
           teamId: pairData.teamId,
-          userIds: pairData.user.map((user) => user.userId),
+          userIds:
+            pairData.user !== undefined
+              ? pairData.user.map((user) => user.userId)
+              : undefined,
         }),
       )
     } else {

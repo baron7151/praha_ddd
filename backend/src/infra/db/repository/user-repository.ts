@@ -22,7 +22,6 @@ export class UserRepository implements IUserRepository {
         await tx.user.update({
           where: { userId: userId.value },
           data: {
-            userId: userId.value,
             userName: userName.value,
             email: email.value,
             status: status,
@@ -51,8 +50,6 @@ export class UserRepository implements IUserRepository {
     if (userData !== null) {
       return UserFactory.create({
         ...userData,
-        pairId: userData?.pairId !== null ? userData.pairId : undefined,
-        teamId: userData?.teamId !== null ? userData.teamId : undefined,
       })
     } else {
       return undefined
@@ -66,8 +63,6 @@ export class UserRepository implements IUserRepository {
     if (userData !== null) {
       return UserFactory.create({
         ...userData,
-        pairId: userData?.pairId !== null ? userData.pairId : undefined,
-        teamId: userData?.teamId !== null ? userData.teamId : undefined,
       })
     } else {
       return undefined
@@ -90,8 +85,6 @@ export class UserRepository implements IUserRepository {
       return userDatas.map((userData) => {
         return UserFactory.create({
           ...userData,
-          pairId: userData?.pairId !== null ? userData.pairId : undefined,
-          teamId: userData?.teamId !== null ? userData.teamId : undefined,
         })
       })
     } else {
@@ -106,8 +99,6 @@ export class UserRepository implements IUserRepository {
       return userDatas.map((userData) => {
         return UserFactory.create({
           ...userData,
-          pairId: userData?.pairId !== null ? userData.pairId : undefined,
-          teamId: userData?.teamId !== null ? userData.teamId : undefined,
         })
       })
     } else {
@@ -123,8 +114,6 @@ export class UserRepository implements IUserRepository {
       return userDatas.map((userData) => {
         return UserFactory.create({
           ...userData,
-          pairId: userData?.pairId !== null ? userData.pairId : undefined,
-          teamId: userData?.teamId !== null ? userData.teamId : undefined,
         })
       })
     } else {

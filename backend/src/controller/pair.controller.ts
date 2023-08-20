@@ -40,7 +40,6 @@ export class PairController {
       pairId: patchPairDataDto.pair_id,
       pairName: patchPairDataDto.pair_name,
       teamId: patchPairDataDto.team_id,
-      userIds: patchPairDataDto.user_ids,
     })
   }
 }

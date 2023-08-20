@@ -1,53 +1,19 @@
 import { Prisma } from '@prisma/client'
 import { TaskStatus } from 'src/domain/task-progress/task-progress-entity'
+import { TeamId } from 'src/domain/team/team-entity'
 import { UserStatus } from 'src/domain/user/user-entity'
 import { prisma } from 'src/prisma'
 import { uuid } from 'uuidv4'
 
 // モデル投入用のデータ定義
-
-export const testUserData: Prisma.UserCreateInput[] = [
+export const testTeamData: Prisma.TeamCreateInput[] = [
   {
-    userId: uuid(),
-    userName: 'test1',
-    email: 'test1@example.com',
-    status: UserStatus.ACTIVE,
+    teamId: uuid(),
+    teamName: '1',
   },
   {
-    userId: uuid(),
-    userName: 'test2',
-    email: 'test2@example.com',
-    status: UserStatus.ACTIVE,
-  },
-  {
-    userId: uuid(),
-    userName: 'test3',
-    email: 'test3@example.com',
-    status: UserStatus.ACTIVE,
-  },
-  {
-    userId: uuid(),
-    userName: 'test4',
-    email: 'test4@example.com',
-    status: UserStatus.ACTIVE,
-  },
-  {
-    userId: uuid(),
-    userName: 'test5',
-    email: 'test5@example.com',
-    status: UserStatus.ACTIVE,
-  },
-  {
-    userId: uuid(),
-    userName: 'test6',
-    email: 'test6@example.com',
-    status: UserStatus.ACTIVE,
-  },
-  {
-    userId: uuid(),
-    userName: 'test7',
-    email: 'test7@example.com',
-    status: UserStatus.ACTIVE,
+    teamId: uuid(),
+    teamName: '2',
   },
 ]
 
@@ -55,53 +21,122 @@ export const testPairData: Prisma.PairCreateInput[] = [
   {
     pairId: uuid(),
     pairName: 'A',
-    user: {
-      connect: [
-        { userId: testUserData[0]?.userId },
-        { userId: testUserData[1]?.userId },
-      ],
+    team: {
+      connect: { teamId: testTeamData[0]!.teamId },
     },
   },
   {
     pairId: uuid(),
     pairName: 'B',
-    user: {
-      connect: [
-        { userId: testUserData[2]?.userId },
-        { userId: testUserData[3]?.userId },
-        { userId: testUserData[4]?.userId },
-      ],
+    team: {
+      connect: { teamId: testTeamData[0]!.teamId },
     },
   },
   {
     pairId: uuid(),
     pairName: 'C',
+    team: {
+      connect: { teamId: testTeamData[1]!.teamId },
+    },
   },
 ]
 
-export const testTeamData: Prisma.TeamCreateInput[] = [
+export const testUserData: Prisma.UserCreateInput[] = [
   {
-    teamId: uuid(),
-    teamName: '1',
+    userId: uuid(),
+    userName: 'test1',
+    email: 'test1@example.com',
+    status: UserStatus.ACTIVE,
     pair: {
-      connect: [
-        { pairId: testPairData[0]?.pairId },
-        { pairId: testPairData[1]?.pairId },
-      ],
+      connect: { pairId: testPairData[0]?.pairId },
     },
-    user: {
-      connect: [
-        { userId: testUserData[0]?.userId },
-        { userId: testUserData[1]?.userId },
-        { userId: testUserData[2]?.userId },
-        { userId: testUserData[3]?.userId },
-        { userId: testUserData[4]?.userId },
-      ],
+    team: {
+      connect: { teamId: testTeamData[0]?.teamId },
     },
   },
   {
-    teamId: uuid(),
-    teamName: '2',
+    userId: uuid(),
+    userName: 'test2',
+    email: 'test2@example.com',
+    status: UserStatus.ACTIVE,
+    pair: {
+      connect: { pairId: testPairData[0]?.pairId },
+    },
+    team: {
+      connect: { teamId: testTeamData[0]?.teamId },
+    },
+  },
+  {
+    userId: uuid(),
+    userName: 'test3',
+    email: 'test3@example.com',
+    status: UserStatus.ACTIVE,
+    pair: {
+      connect: { pairId: testPairData[1]?.pairId },
+    },
+    team: {
+      connect: { teamId: testTeamData[0]?.teamId },
+    },
+  },
+  {
+    userId: uuid(),
+    userName: 'test4',
+    email: 'test4@example.com',
+    status: UserStatus.ACTIVE,
+    pair: {
+      connect: { pairId: testPairData[1]?.pairId },
+    },
+    team: {
+      connect: { teamId: testTeamData[0]?.teamId },
+    },
+  },
+  {
+    userId: uuid(),
+    userName: 'test5',
+    email: 'test5@example.com',
+    status: UserStatus.ACTIVE,
+    pair: {
+      connect: { pairId: testPairData[2]?.pairId },
+    },
+    team: {
+      connect: { teamId: testTeamData[1]?.teamId },
+    },
+  },
+  {
+    userId: uuid(),
+    userName: 'test6',
+    email: 'test6@example.com',
+    status: UserStatus.ACTIVE,
+    pair: {
+      connect: { pairId: testPairData[2]?.pairId },
+    },
+    team: {
+      connect: { teamId: testTeamData[1]?.teamId },
+    },
+  },
+  {
+    userId: uuid(),
+    userName: 'test7',
+    email: 'test7@example.com',
+    status: UserStatus.ACTIVE,
+    pair: {
+      connect: { pairId: testPairData[2]?.pairId },
+    },
+    team: {
+      connect: { teamId: testTeamData[1]?.teamId },
+    },
+  },
+  {
+    userId: uuid(),
+    userName: 'test8',
+    email: 'test8@example.com',
+    status: UserStatus.INACTIVE,
+  },
+  {
+    userId: uuid(),
+    userName: 'test9',
+    email: 'test9@example.com',
+    status: UserStatus.DELETE,
   },
 ]
 
@@ -493,23 +528,19 @@ export const cleaningAllTables = async () => {
 export const seedsTransfer = async () => {
   console.log(`Start seeding ...`)
   await prisma.$transaction(
-    testUserData.map((d) => prisma.user.create({ data: d })),
+    testTeamData.map((d) => prisma.team.create({ data: d })),
   )
   await prisma.$transaction(
     testPairData.map((d) => prisma.pair.create({ data: d })),
   )
-
   await prisma.$transaction(
-    testTeamData.map((d) => prisma.team.create({ data: d })),
+    testUserData.map((d) => prisma.user.create({ data: d })),
   )
-
   await prisma.$transaction(
     testTaskData.map((d) => prisma.task.create({ data: d })),
   )
-
   await prisma.$transaction(
     testTaskProgressData.map((d) => prisma.taskProgress.create({ data: d })),
   )
-
   console.log(`Seeding finished.`)
 }

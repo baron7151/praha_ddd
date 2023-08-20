@@ -45,36 +45,25 @@ describe('TeamRepository', () => {
   })
 
   describe('test save()', () => {
+    const teamId = new TeamId()
     it('should save the team data(create)', async () => {
-      const teamId = new TeamId()
       const teamName = new TeamName('9')
-      const pairId1 = new PairId(testPairData[0]?.pairId)
-      const pairId2 = new PairId(testPairData[1]?.pairId)
-      const pairIds = [pairId1, pairId2]
-      const team = new TeamEntity(teamId, teamName, pairIds)
+      const team = new TeamEntity(teamId, teamName)
       await teamRepository.save(team)
       const result = await teamRepository.findByTeamId(teamId)
       expect(result?.getAllProperties()).toEqual({
         teamId: teamId,
         teamName: teamName,
-        pairIds: pairIds,
       })
     })
     it('should save the team data(update)', async () => {
-      await cleaningAllTables()
-      await seedsTransfer()
-      const teamId = new TeamId(testTeamData[0]!.teamId)
       const teamName = new TeamName('8')
-      const pairId1 = new PairId(testPairData[0]?.pairId)
-      const pairId2 = new PairId(testPairData[1]?.pairId)
-      const pairIds = [pairId1, pairId2]
-      const team = new TeamEntity(teamId, teamName, pairIds)
+      const team = new TeamEntity(teamId, teamName)
       await teamRepository.save(team)
       const result = await teamRepository.findByTeamId(teamId)
       expect(result?.getAllProperties()).toEqual({
         teamId: teamId,
         teamName: teamName,
-        pairIds: pairIds,
       })
     })
   })

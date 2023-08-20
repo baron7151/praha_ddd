@@ -29,7 +29,6 @@ export class TeamController {
     await this.patchTeamDataUseCase.do({
       teamId: patchTeamDataDto.team_id,
       teamName: patchTeamDataDto.team_name,
-      pairIds: patchTeamDataDto.pair_ids,
     })
   }
 }

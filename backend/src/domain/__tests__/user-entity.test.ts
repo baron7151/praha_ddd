@@ -11,6 +11,7 @@ describe('UserEntity', () => {
   const testEmail = new Email('test1@example.com')
   const testStatus = UserStatus.ACTIVE
   const testPairId = new PairId()
+  const testTeamId = new TeamId()
   describe('getAllProperties()', () => {
     it('should create UserEntity instance', () => {
       const user = new UserEntity(
@@ -19,6 +20,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
       expect(user).toBeInstanceOf(UserEntity)
       expect(user.getAllProperties()).toEqual({
@@ -27,6 +29,7 @@ describe('UserEntity', () => {
         email: testEmail,
         status: testStatus,
         pairId: testPairId,
+        teamId: testTeamId,
       })
     })
   })
@@ -38,6 +41,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
       const user2 = new UserEntity(
         testUserId,
@@ -45,6 +49,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
       const user3 = new UserEntity(
         new UserId(uuid()),
@@ -52,6 +57,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
 
       expect(user1.equals(user2)).toBe(true)
@@ -66,6 +72,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
       const inActiveUser = new UserEntity(
         testUserId,
@@ -103,6 +110,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
 
       const newUser = user.changeStatus(UserStatus.INACTIVE)
@@ -143,6 +151,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
       const newUser = user.changeUserName(new UserName('Jane Smith'))
 
@@ -152,6 +161,7 @@ describe('UserEntity', () => {
         email: testEmail,
         status: testStatus,
         pairId: testPairId,
+        teamId: testTeamId,
       })
     })
   })
@@ -163,6 +173,7 @@ describe('UserEntity', () => {
         testEmail,
         testStatus,
         testPairId,
+        testTeamId,
       )
       const newUser = user.changeEmail(new Email('test2@example.com'))
 
@@ -172,6 +183,7 @@ describe('UserEntity', () => {
         email: new Email('test2@example.com'),
         status: testStatus,
         pairId: testPairId,
+        teamId: testTeamId,
       })
     })
   })
@@ -199,6 +211,58 @@ describe('UserEntity', () => {
       expect(UserEntity.checkUserStatusAndPairAndTeam(UserStatus.DELETE)).toBe(
         false,
       )
+    })
+  })
+  describe('changePair()', () => {
+    it('should change user pair', () => {
+      const user = new UserEntity(
+        testUserId,
+        testUserName,
+        testEmail,
+        testStatus,
+        testPairId,
+        testTeamId,
+      )
+      const newPair = new PairId()
+      const newUser = user.changePair(newPair)
+
+      expect(newUser.getAllProperties()).toEqual({
+        userId: testUserId,
+        userName: testUserName,
+        email: testEmail,
+        status: testStatus,
+        pairId: newPair,
+        teamId: testTeamId,
+      })
+    })
+  })
+  describe('changeTeam()', () => {
+    it('should change user team', () => {
+      const user = new UserEntity(
+        testUserId,
+        testUserName,
+        testEmail,
+        testStatus,
+        testPairId,
+        testTeamId,
+      )
+      const newTeam = new TeamId()
+      const newUser = user.changeTeam(newTeam)
+
+      expect(newUser.getAllProperties()).toEqual({
+        userId: testUserId,
+        userName: testUserName,
+        email: testEmail,
+        status: testStatus,
+        pairId: testPairId,
+        teamId: newTeam,
+      })
+    })
+  })
+  describe('isStringInUserStatus()', () => {
+    it('should return true', () => {
+      expect(UserEntity.isStringInUserStatus('ACTIVE')).toBe(true)
+      expect(UserEntity.isStringInUserStatus('ACTIV')).toBe(false)
     })
   })
 })

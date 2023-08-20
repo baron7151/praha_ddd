@@ -3,13 +3,20 @@ import { mockTeamRepository } from '@testUtil/mock/infra/repository/repository.m
 import { PatchTeamDataUseCase } from 'src/app/team/patch-team-data-usecase'
 import { PairId } from 'src/domain/pair/pair-entity'
 import { TeamId, TeamName, TeamEntity } from 'src/domain/team/team-entity'
+import { TeamFactory } from 'src/domain/team/team-factory'
 import { UserId } from 'src/domain/user/user-entity'
+import { TeamRepository } from 'src/infra/db/repository/team-repository'
 
 describe('PatchTeamDataUseCase', () => {
   let patchTeamDataUseCase: PatchTeamDataUseCase
+  let teamRepository = new TeamRepository()
+  let mockTeamFactory = new TeamFactory(teamRepository)
 
   beforeEach(() => {
-    patchTeamDataUseCase = new PatchTeamDataUseCase(mockTeamRepository)
+    patchTeamDataUseCase = new PatchTeamDataUseCase(
+      mockTeamRepository,
+      mockTeamFactory,
+    )
   })
 
   describe('do', () => {
@@ -19,23 +26,19 @@ describe('PatchTeamDataUseCase', () => {
       const updateTeamName = new TeamName('8')
       const pairId1 = new PairId()
       const pairId2 = new PairId()
-      const pairId3 = new PairId()
       const pairIds = [pairId1, pairId2]
-      const updatePairIds = [pairId3]
-
       const existingTeam = new TeamEntity(teamId, teamName, pairIds)
+      const updateTeam = new TeamEntity(teamId, updateTeamName, pairIds)
       mockTeamRepository.findByTeamId.mockResolvedValueOnce(existingTeam)
+      mockTeamFactory.reconstruct = jest.fn().mockResolvedValueOnce(updateTeam)
 
       await patchTeamDataUseCase.do({
         teamId: teamId.value,
         teamName: updateTeamName.value,
-        pairIds: updatePairIds.map((pairId) => pairId.value),
       })
 
       expect(mockTeamRepository.findByTeamId).toHaveBeenCalledWith(teamId)
-      expect(mockTeamRepository.save).toHaveBeenCalledWith(
-        new TeamEntity(teamId, updateTeamName, updatePairIds),
-      )
+      expect(mockTeamRepository.save).toHaveBeenCalledWith(updateTeam)
     })
 
     it('should throw an error when team does not exist', async () => {
@@ -46,7 +49,7 @@ describe('PatchTeamDataUseCase', () => {
       mockTeamRepository.findByTeamId.mockResolvedValueOnce(undefined)
 
       await expect(
-        patchTeamDataUseCase.do({ teamId, teamName, pairIds }),
+        patchTeamDataUseCase.do({ teamId, teamName }),
       ).rejects.toThrow()
     })
   })

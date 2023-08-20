@@ -26,13 +26,15 @@ export class PairFactory {
     userIds?: string[]
   }): PairEntity {
     const { pairId, pairName, teamId, userIds } = props
+    const mappedUserIds =
+      userIds != null && userIds.length > 0
+        ? userIds.map((userId) => new UserId(userId))
+        : undefined
     return new PairEntity(
       new PairId(pairId),
       new PairName(pairName),
-      teamId === undefined ? undefined : new TeamId(teamId),
-      userIds === undefined
-        ? undefined
-        : userIds.map((userId) => new UserId(userId)),
+      teamId != null ? new TeamId(teamId) : undefined,
+      mappedUserIds,
     )
   }
 

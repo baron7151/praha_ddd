@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PairId } from 'src/domain/pair/pair-entity'
 import { TeamEntity, TeamId, TeamName } from 'src/domain/team/team-entity'
+import { TeamFactory } from 'src/domain/team/team-factory'
 import { ITeamRepository } from 'src/domain/team/team-repository'
 import { UserId } from 'src/domain/user/user-entity'
 import { prisma } from 'src/prisma'
@@ -8,25 +9,12 @@ import { prisma } from 'src/prisma'
 @Injectable()
 export class TeamRepository implements ITeamRepository {
   public async save(saveTeamEntity: TeamEntity): Promise<void> {
-    const { teamId, teamName, pairIds } = saveTeamEntity.getAllProperties()
+    const { teamId, teamName } = saveTeamEntity.getAllProperties()
     const teamData = {
       teamId: teamId.value,
       teamName: teamName.value,
-      ...(pairIds !== undefined && {
-        pair: {
-          connect: pairIds.map((pairId) => ({ pairId: pairId.value })),
-        },
-      }),
     }
     await prisma.$transaction(async (tx) => {
-      if (pairIds !== undefined) {
-        const pair = await tx.pair.findMany({
-          where: { pairId: { in: pairIds.map((pairId) => pairId.value) } },
-        })
-        if (pair.length !== pairIds.length) {
-          throw new Error('do not found pairId')
-        }
-      }
       const result = await tx.team.findUnique({
         where: { teamId: teamId.value },
       })
@@ -37,8 +25,12 @@ export class TeamRepository implements ITeamRepository {
           },
         })
       } else {
-        await tx.team.delete({ where: { teamId: teamId.value } })
-        await tx.team.create({ data: { ...teamData } })
+        await tx.team.update({
+          where: { teamId: teamId.value },
+          data: {
+            teamName: teamName.value,
+          },
+        })
       }
     })
   }
@@ -49,12 +41,12 @@ export class TeamRepository implements ITeamRepository {
       include: { pair: true, user: true },
     })
     if (teamData !== null) {
-      return new TeamEntity(
-        new TeamId(teamData.teamId),
-        new TeamName(teamData.teamName),
-        teamData.pair.map(({ pairId }) => new PairId(pairId)),
-        teamData.user.map(({ userId }) => new UserId(userId)),
-      )
+      return TeamFactory.create({
+        teamId: teamData.teamId,
+        teamName: teamData.teamName,
+        pairIds: teamData.pair.map((pair) => pair.pairId),
+        userIds: teamData.user.map((user) => user.userId),
+      })
     } else {
       return undefined
     }
@@ -75,14 +67,13 @@ export class TeamRepository implements ITeamRepository {
       include: { pair: true, user: true },
     })
     if (teamDatas !== null) {
-      return teamDatas.map(
-        (teamData) =>
-          new TeamEntity(
-            new TeamId(teamData.teamId),
-            new TeamName(teamData.teamName),
-            teamData.pair.map(({ pairId }) => new PairId(pairId)),
-            teamData.user.map(({ userId }) => new UserId(userId)),
-          ),
+      return teamDatas.map((teamData) =>
+        TeamFactory.create({
+          teamId: teamData.teamId,
+          teamName: teamData.teamName,
+          pairIds: teamData.pair.map((pair) => pair.pairId),
+          userIds: teamData.user.map((user) => user.userId),
+        }),
       )
     } else {
       return undefined

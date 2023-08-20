@@ -45,40 +45,39 @@ describe('PairRepository', () => {
   })
 
   describe('test save()', () => {
+    const pairId = new PairId()
     it('should save the pair data(create)', async () => {
-      const pairId = new PairId()
       const pairName = new PairName('Z')
-      const userId1 = new UserId(testUserData[5]?.userId)
-      const userId2 = new UserId(testUserData[6]?.userId)
       const teamId = new TeamId(testTeamData[0]?.teamId)
-      const userIds = [userId1, userId2]
-      const pair = new PairEntity(pairId, pairName, teamId, userIds)
+      const pair = new PairEntity(pairId, pairName, teamId)
       await pairRepository.save(pair)
-      const result = await pairRepository.findByPairId(pairId)
-      expect(result?.getAllProperties()).toEqual({
-        pairId: pairId,
-        pairName: pairName,
-        teamId: teamId,
-        userIds: userIds,
+      const result = await prisma.pair.findUnique({
+        where: { pairId: pairId.value },
       })
+
+      expect(result?.pairId).toBe(pairId.value)
+      expect(result?.pairName).toBe(pairName.value)
+      expect(result?.teamId).toBe(teamId.value)
     })
     it('should save the pair data(update)', async () => {
-      await cleaningAllTables()
-      await seedsTransfer()
-      const pairId = new PairId(testPairData[0]!.pairId)
       const pairName = new PairName('X')
-      const userId1 = new UserId(testUserData[5]?.userId)
-      const userId2 = new UserId(testUserData[6]?.userId)
-      const teamId = new TeamId(testTeamData[0]?.teamId)
-      const userIds = [userId1, userId2]
-      const pair = new PairEntity(pairId, pairName, teamId, userIds)
+      const teamId = new TeamId(testTeamData[1]?.teamId)
+      const pair = new PairEntity(pairId, pairName, teamId)
       await pairRepository.save(pair)
-      const result = await pairRepository.findByPairId(pairId)
-      expect(result?.getAllProperties()).toEqual({
-        pairId: pairId,
-        pairName: pairName,
-        teamId: teamId,
-        userIds: userIds,
+      const result = await prisma.pair.findUnique({
+        where: { pairId: pairId.value },
+      })
+      expect(result?.pairId).toBe(pairId.value)
+      expect(result?.pairName).toBe(pairName.value)
+      expect(result?.teamId).toBe(teamId.value)
+    })
+  })
+  describe('test findByTeamId()', () => {
+    it('should return pairEntities.', async () => {
+      const teamId = new TeamId(testTeamData[0]?.teamId)
+      const result = await pairRepository.findByTeamId(teamId)
+      result!.forEach((pairEntity) => {
+        expect(pairEntity.getAllProperties().teamId).toEqual(teamId)
       })
     })
   })

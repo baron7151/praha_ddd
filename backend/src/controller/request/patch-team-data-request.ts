@@ -12,8 +12,4 @@ export class PatchTeamDataRequest {
   @ApiProperty()
   @IsString()
   readonly team_name?: string
-
-  @ApiProperty()
-  @IsArray()
-  readonly pair_ids?: string[]
 }

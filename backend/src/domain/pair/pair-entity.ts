@@ -14,8 +14,8 @@ export class PairId extends BaseUuid {
 export class PairEntity {
   private pairId: PairId
   private pairName: PairName
-  private teamId?: TeamId
-  private userIds?: UserId[]
+  private readonly teamId?: TeamId
+  private readonly userIds?: UserId[]
   constructor(
     pairId: PairId,
     pairName: PairName,
@@ -63,24 +63,6 @@ export class PairEntity {
       return false
     } else {
       return true
-    }
-  }
-  removePairUser(userId: UserId): PairEntity {
-    if (this.userIds === undefined) {
-      return new PairEntity(this.pairId, this.pairName)
-    } else {
-      const userIds = this.userIds.filter(
-        (removeElement) => removeElement !== userId,
-      )
-      return new PairEntity(this.pairId, this.pairName, this?.teamId, userIds)
-    }
-  }
-  addPairUser(userId: UserId): PairEntity {
-    if (this.userIds === undefined) {
-      return new PairEntity(this.pairId, this.pairName, this?.teamId, [userId])
-    } else {
-      const userIds = [...this.userIds, userId]
-      return new PairEntity(this.pairId, this.pairName, this?.teamId, userIds)
     }
   }
   getId(): PairId {
