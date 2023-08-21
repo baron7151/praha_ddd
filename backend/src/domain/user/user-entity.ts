@@ -138,7 +138,7 @@ export class UserEntity {
       return false
     }
   }
-  changePair(changePairId: PairId): UserEntity {
+  changePair(changePairId: PairId | undefined): UserEntity {
     return new UserEntity(
       this.userId,
       this.userName,
@@ -148,7 +148,7 @@ export class UserEntity {
       this.teamId,
     )
   }
-  changeTeam(changeTeamId: TeamId): UserEntity {
+  changeTeam(changeTeamId: TeamId | undefined): UserEntity {
     return new UserEntity(
       this.userId,
       this.userName,
@@ -160,5 +160,8 @@ export class UserEntity {
   }
   static isStringInUserStatus(inputString: string): boolean {
     return Object.values(UserStatus as any).includes(inputString)
+  }
+  getId(): UserId {
+    return this.userId
   }
 }

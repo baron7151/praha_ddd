@@ -9,7 +9,6 @@ import {
 import { PatchPairDataUseCase } from 'src/app/pair/patch-pair-data-usecase'
 import { TeamId } from 'src/domain/team/team-entity'
 import { PairFactory } from 'src/domain/pair/pair-factory'
-import { UserFactory } from 'src/domain/user/user-factory'
 
 describe('PatchPairDataUseCase', () => {
   let patchPairDataUseCase: PatchPairDataUseCase

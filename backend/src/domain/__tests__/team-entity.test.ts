@@ -1,6 +1,6 @@
 import { PairEntity, PairId, PairName } from '../pair/pair-entity'
 import { TeamEntity, TeamId, TeamName } from '../team/team-entity'
-import { UserId } from '../user/user-entity'
+import { UserEntity, UserId } from '../user/user-entity'
 
 describe('TeamEntity', () => {
   const teamId = new TeamId()
@@ -9,6 +9,11 @@ describe('TeamEntity', () => {
   const pairId2 = new PairId()
   const pairId3 = new PairId()
   const pairIds = [pairId1, pairId2, pairId3]
+  const userId1 = new UserId()
+  const userId2 = new UserId()
+  const userId3 = new UserId()
+  const userIds = [userId1, userId2, userId3]
+  const teamEntity = new TeamEntity(teamId, teamName, pairIds, userIds)
 
   describe('constructor', () => {
     it('should create a TeamEntity instance with valid user count', () => {
@@ -18,7 +23,6 @@ describe('TeamEntity', () => {
 
   describe('changeTeamName', () => {
     it('should return a new PairEntity instance with the updated pair name', () => {
-      const teamEntity = new TeamEntity(teamId, teamName, pairIds)
       const newTeamName = new TeamName('2')
 
       const updatedTeamEntity = teamEntity.changeTeamName(newTeamName)
@@ -31,33 +35,50 @@ describe('TeamEntity', () => {
   describe('equals', () => {
     it('should return true when comparing two equal TeamEntity instances', () => {
       const teamEntity1 = new TeamEntity(teamId, teamName, pairIds)
-      const teamEntity2 = new TeamEntity(teamId, teamName, pairIds)
 
-      const result = teamEntity1.equals(teamEntity2)
+      const result = teamEntity.equals(teamEntity1)
 
       expect(result).toBe(true)
     })
   })
-
-  // describe('removePairUser', () => {
-  //   it('should return a new PairEntity instance with the specified user removed', () => {
-  //     const pairEntity = new PairEntity(pairId, pairName, userIds)
-  //     const updatedPairEntity = pairEntity.removePairUser(userId3)
-
-  //     expect(updatedPairEntity).toBeInstanceOf(PairEntity)
-  //     expect(updatedPairEntity.getAllProperties().userIds?.length).toEqual(2)
-  //   })
-  // })
-
-  // describe('addPairUser', () => {
-  //   it('should return a new PairEntity instance with the specified user added', () => {
-  //     const pairEntity = new PairEntity(pairId, pairName, userIds.slice(1, 3))
-  //     const updatedPairEntity = pairEntity.addPairUser(userId3)
-
-  //     expect(updatedPairEntity).toBeInstanceOf(PairEntity)
-  //     expect(updatedPairEntity.getAllProperties().userIds?.length).toEqual(3)
-  //   })
-  // })
+  describe('getAllProperties()', () => {
+    it('should get All TeamEntity properties.', () => {
+      expect(teamEntity.getAllProperties()).toEqual({
+        teamId: teamId,
+        teamName: teamName,
+        pairIds: pairIds,
+        userIds: userIds,
+      })
+    })
+  })
+  describe('validateTeamUserCount()', () => {
+    it('should validate user count', () => {
+      expect(TeamEntity.validateTeamUserCount()).toBe(true)
+      expect(TeamEntity.validateTeamUserCount([new UserId()])).toBe(false)
+      expect(
+        TeamEntity.validateTeamUserCount([
+          new UserId(),
+          new UserId(),
+          new UserId(),
+        ]),
+      ).toBe(true)
+    })
+  })
+  describe('countTeamUser()', () => {
+    it('should return User Count.', () => {
+      expect(teamEntity.countTeamUser()).toBe(userIds.length)
+    })
+  })
+  describe('getId()', () => {
+    it('should return team id.', () => {
+      expect(teamEntity.getId()).toEqual(teamId)
+    })
+  })
+  describe('isMinimumMember()', () => {
+    it('sholud check user count. ', () => {
+      expect(teamEntity.isMinimumMember()).toBe(true)
+    })
+  })
 })
 
 describe('TeamName', () => {

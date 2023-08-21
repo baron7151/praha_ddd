@@ -1,12 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common'
 import { Providers } from 'src/providers'
 import { DomainError } from '../common/domain-error'
-import { Email } from '../common/email'
 import { TeamEntity, TeamId, TeamName } from './team-entity'
-import { UserEntity, UserId, UserStatus, UserName } from '../user/user-entity'
+import { UserId } from '../user/user-entity'
 
 import { ITeamRepository } from './team-repository'
-import { IUserRepository } from '../user/user-repository'
 import { PairEntity, PairId, PairName } from '../pair/pair-entity'
 
 @Injectable()

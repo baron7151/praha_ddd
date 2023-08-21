@@ -14,9 +14,6 @@ export class PairService {
   constructor(
     @Inject(Providers.IPairRepository)
     private pairRepository: IPairRepository,
-    @Inject(Providers.ITeamRepository)
-    private teamRepository: ITeamRepository,
-    @Inject(Providers.IUserRepository) private userRepository: IUserRepository,
   ) {}
   //TODO ペアに所属するメンバー数に変更があり、ユーザの休会・退会に伴い複数名のメンバーの移動がある場合は仕様の見直しが必要になる。
 

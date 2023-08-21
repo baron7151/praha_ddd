@@ -20,10 +20,14 @@ export class TeamEntity {
     pairIds?: PairId[],
     userIds?: UserId[],
   ) {
-    this.teamId = teamId
-    this.teamName = teamName
-    this.pairIds = pairIds
-    this.userIds = userIds
+    if (!TeamEntity.validateTeamUserCount(userIds)) {
+      throw new DomainError('Team User must be more than 2 members.')
+    } else {
+      this.teamId = teamId
+      this.teamName = teamName
+      this.pairIds = pairIds
+      this.userIds = userIds
+    }
   }
   equals(other: TeamEntity): boolean {
     if (other == null || other == undefined) {
@@ -45,10 +49,10 @@ export class TeamEntity {
       userIds: this?.userIds,
     }
   }
-  static checkTeamUserCount(userIds?: UserId[]): boolean {
+  static validateTeamUserCount(userIds?: UserId[]): boolean {
     if (userIds === undefined) {
       return true
-    } else if (userIds.length > 2) {
+    } else if (userIds.length >= MIN_TEAM_USER) {
       return true
     } else {
       return false

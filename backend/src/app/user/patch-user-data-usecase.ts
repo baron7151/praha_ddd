@@ -26,7 +26,6 @@ export class PatchUserDataUseCase {
     @Inject(Providers.IPairRepository) private pairRepository: IPairRepository,
     @Inject(PairService) private pairService: PairService,
     @Inject(TeamService) private teamService: TeamService,
-    @Inject(UserService) private userService: UserService,
   ) {}
   public async do(data: {
     userId: string
@@ -35,12 +34,13 @@ export class PatchUserDataUseCase {
     status?: string
   }): Promise<void> {
     const { userId, email, userName, status } = data
-    const userEntity = await this.userRepository.findByUserId(
-      new UserId(userId),
-    )
+    let userEntity = await this.userRepository.findByUserId(new UserId(userId))
     if (userEntity !== undefined) {
       if (status && UserEntity.isStringInUserStatus(status)) {
-        await this.changeUserStatus(userEntity, status as UserStatus)
+        await this.saveChangeUserStatus(userEntity, status as UserStatus)
+        userEntity = (await this.userRepository.findByUserId(
+          new UserId(userId),
+        )) as UserEntity
       }
       if (email || userName) {
         const newUserEntity = await this.userFactory.reconstruct({
@@ -54,7 +54,7 @@ export class PatchUserDataUseCase {
       throw new Error('Not Found.')
     }
   }
-  async changeUserStatus(userEntity: UserEntity, newStatus: UserStatus) {
+  async saveChangeUserStatus(userEntity: UserEntity, newStatus: UserStatus) {
     const { userId, userName, email, status, pairId, teamId } =
       userEntity.getAllProperties()
     if (newStatus === UserStatus.ACTIVE) {

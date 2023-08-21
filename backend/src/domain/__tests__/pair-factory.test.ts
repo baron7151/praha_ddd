@@ -50,7 +50,14 @@ describe('PairFactory', () => {
         mockPairRepository.exists = jest.fn().mockReturnValue(false)
         mockTeamRepository.findByTeamId = jest
           .fn()
-          .mockReturnValue(new TeamEntity(new TeamId(), new TeamName('1')))
+          .mockReturnValue(
+            new TeamEntity(
+              new TeamId(),
+              new TeamName('1'),
+              [new PairId()],
+              [new UserId(), new UserId(), new UserId()],
+            ),
+          )
         mockUserRepository.findByUserId = jest
           .fn()
           .mockReturnValue(
