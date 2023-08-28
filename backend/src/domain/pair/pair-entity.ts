@@ -68,20 +68,6 @@ export class PairEntity {
   getId(): PairId {
     return this.pairId
   }
-  static create(props: {
-    pairId: string
-    pairName: string
-    teamId?: string | null
-    userIds?: string[] | null
-  }): PairEntity {
-    const { pairId, pairName, teamId, userIds } = props
-    return new PairEntity(
-      new PairId(pairId),
-      new PairName(pairName),
-      teamId != null ? new TeamId(teamId) : undefined,
-      userIds != null ? userIds.map((userId) => new UserId(userId)) : undefined,
-    )
-  }
   changeTeam(teamId: TeamId) {
     return new PairEntity(this.pairId, this.pairName, teamId, this.userIds)
   }

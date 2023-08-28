@@ -57,8 +57,8 @@ export class PatchUserDataUseCase {
   async saveChangeUserStatus(userEntity: UserEntity, newStatus: UserStatus) {
     const { userId, userName, email, status, pairId, teamId } =
       userEntity.getAllProperties()
-    if (newStatus === UserStatus.ACTIVE) {
-      if (status === UserStatus.INACTIVE) {
+    if (newStatus == UserStatus.ACTIVE) {
+      if (status == UserStatus.INACTIVE) {
         /*
         休会中の参加者が復帰した（在籍ステータス「在籍中」に切り替わった）際に所属するチームとペアは、最も参加人数が少ないチームの中で、
         最も参加人数が少ないペアから自動的に選ばれる参加人数が同じの場合はランダムに選択する
@@ -123,7 +123,7 @@ export class PatchUserDataUseCase {
         } else {
           throw new Error('Failed to find moveable Team.')
         }
-      } else if (status === UserStatus.DELETE) {
+      } else if (status == UserStatus.DELETE) {
         throw new Error('The user status of a DELETE member cannot be changed.')
       }
     } else if (newStatus === UserStatus.DELETE || UserStatus.INACTIVE) {
@@ -135,17 +135,15 @@ export class PatchUserDataUseCase {
               team.getId(),
             )
             let teamUserNames = undefined
-            if (userEntities !== undefined) {
-              teamUserNames = userEntities.map(
-                (userEntity) => userEntity!.getAllProperties().userName,
-              )
-              const teamName = team.getAllProperties().teamName
-              UserService.notifyWithTeamMemberDecrease(
-                teamName,
-                teamUserNames,
-                userName,
-              )
-            }
+            teamUserNames = userEntities!.map(
+              (userEntity) => userEntity!.getAllProperties().userName,
+            )
+            const teamName = team.getAllProperties().teamName
+            UserService.notifyWithTeamMemberDecrease(
+              teamName,
+              teamUserNames,
+              userName,
+            )
           }
         }
         if (pairId) {
