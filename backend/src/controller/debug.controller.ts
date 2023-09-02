@@ -4,6 +4,8 @@ import {
   Post,
   HttpException,
   HttpStatus,
+  Get,
+  Query,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
 import { cleaningAllTables, seedsTransfer } from '@testUtil/initial_data/seed'
@@ -13,14 +15,14 @@ import { cleaningAllTables, seedsTransfer } from '@testUtil/initial_data/seed'
 export class DebugController {
   constructor() {}
 
-  @Post()
+  @Get()
   @ApiResponse({ status: 201 })
-  async postDebug(@Body('operation') operation: string) {
+  async postDebug(@Query('operation') operation: string) {
     switch (operation) {
       case 'init':
         await cleaningAllTables()
         await seedsTransfer()
-        return 'suucess'
+        return 'success'
       default:
         throw new HttpException('Forbidden', HttpStatus.FORBIDDEN)
     }

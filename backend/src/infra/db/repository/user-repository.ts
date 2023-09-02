@@ -14,6 +14,13 @@ export class UserRepository implements IUserRepository {
   public async save(saveUserEntity: UserEntity): Promise<void> {
     const { userId, userName, email, status, pairId, teamId } =
       saveUserEntity.getAllProperties()
+    const updateUserData = {
+      userName: userName.value,
+      email: email.value,
+      status: status,
+      pairId: pairId?.value ?? null,
+      teamId: teamId?.value ?? null,
+    }
     await prisma.$transaction(async (tx) => {
       const result = await tx.user.findUnique({
         where: { userId: userId.value },
@@ -22,22 +29,14 @@ export class UserRepository implements IUserRepository {
         await tx.user.update({
           where: { userId: userId.value },
           data: {
-            userName: userName.value,
-            email: email.value,
-            status: status,
-            pairId: pairId?.value,
-            teamId: teamId?.value,
+            ...updateUserData,
           },
         })
       } else {
         await tx.user.create({
           data: {
             userId: userId.value,
-            userName: userName.value,
-            email: email.value,
-            status: status,
-            pairId: pairId?.value,
-            teamId: teamId?.value,
+            ...updateUserData,
           },
         })
       }

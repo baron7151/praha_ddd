@@ -23,7 +23,9 @@ describe('UserRepository', () => {
   const userName = new UserName('test100')
   const email = new Email('test100@example.com')
   const status = UserStatus.ACTIVE
-  const user = new UserEntity(userId, userName, email, status)
+  const pairId = new PairId(testPairData[0]?.pairId)
+  const teamId = new TeamId(testTeamData[0]?.teamId)
+  const user = new UserEntity(userId, userName, email, status, pairId, teamId)
   let userRepository = new UserRepository()
 
   beforeEach(() => {})
@@ -45,7 +47,7 @@ describe('UserRepository', () => {
     // saveメソッドを実行
     await userRepository.save(user)
     const result = await userRepository.findByUserId(userId)
-    expect(result?.getAllProperties().userId.value).toBe(userId.value)
+    expect(result!.getAllProperties()).toEqual(user.getAllProperties())
     // 保存されたデータを検証するなどの処理を記述
   })
   test('saveメソッドが正常に動作すること(update)', async () => {
@@ -55,8 +57,7 @@ describe('UserRepository', () => {
     // saveメソッドを実行
     await userRepository.save(updateUser)
     const result = await userRepository.findByUserId(userId)
-    expect(result?.getAllProperties().userId.value).toBe(userId.value)
-    expect(result?.getAllProperties().userName.value).toBe(updateUserName.value)
+    expect(result!.getAllProperties()).toEqual(updateUser.getAllProperties())
   })
 
   test('findメソッドが検索条件にUserID指定して正常に動作すること', async () => {

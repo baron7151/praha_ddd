@@ -49,7 +49,7 @@ describe('UserService', () => {
           testChangeStatusUserName.value
         }\n移動が必要な参加者名：${testMoveUserNames.map(
           (moveUserName) => moveUserName.value,
-        )}}`,
+        )}`,
       )
       spy.mockRestore()
     })

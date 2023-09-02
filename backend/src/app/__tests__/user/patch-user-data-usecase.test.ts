@@ -329,7 +329,11 @@ describe('PatchUserDataUseCase', () => {
       expect(mockUserRepository.findByTeamId).toHaveBeenCalledWith(teamId)
       expect(
         patchUserDataUseCase.movePairMemberWithPairMemberDecrease,
-      ).toBeCalledWith(pairId, new UserName(userData.userName))
+      ).toBeCalledWith(
+        new UserId(userData.userId),
+        pairId,
+        new UserName(userData.userName),
+      )
       expect(mockUserRepository.save).toHaveBeenCalledWith(updateUserEntity)
     })
   })
@@ -337,7 +341,8 @@ describe('PatchUserDataUseCase', () => {
     it('move pair member with pair member decrease.', async () => {
       const moveUserPairId = new PairId()
       const moveUserTeamId = new TeamId()
-      const moveUserIds = [new UserId(), new UserId()]
+      const moveUserId = new UserId()
+      const moveUserIds = [new UserId()]
       const changeStatusUserName = new UserName('changeStatusUser')
       const moveUsers = [
         new UserEntity(
@@ -346,19 +351,13 @@ describe('PatchUserDataUseCase', () => {
           new Email('test1@example.com'),
           UserStatus.ACTIVE,
         ),
-        new UserEntity(
-          moveUserIds[1] as UserId,
-          new UserName('test2'),
-          new Email('test2@exmaple.com'),
-          UserStatus.ACTIVE,
-        ),
       ]
 
       const moveUserPair = new PairEntity(
         moveUserPairId,
         new PairName('a'),
         moveUserTeamId,
-        moveUserIds,
+        [moveUserId, moveUserIds[0]!],
       )
       mockPairRepository.findByPairId = jest
         .fn()
@@ -390,6 +389,7 @@ describe('PatchUserDataUseCase', () => {
       )
 
       await patchUserDataUseCase.movePairMemberWithPairMemberDecrease(
+        moveUserId,
         moveUserPairId,
         changeStatusUserName,
       )
@@ -399,7 +399,7 @@ describe('PatchUserDataUseCase', () => {
       expect(mockUserRepository.findByManyUserIds).toHaveBeenCalledWith(
         moveUserIds,
       )
-      expect(mockUserRepository.save).toHaveBeenCalledTimes(2)
+      expect(mockUserRepository.save).toHaveBeenCalledTimes(1)
     })
   })
 })

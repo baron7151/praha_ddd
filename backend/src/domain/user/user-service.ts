@@ -28,7 +28,7 @@ export class UserService {
         changeStatusUserName.value
       }\n移動が必要な参加者名：${moveUserNames.map(
         (moveUserName) => moveUserName.value,
-      )}}`,
+      )}`,
     )
   }
 }

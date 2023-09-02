@@ -26,6 +26,9 @@ import { DebugController } from './controller/debug.controller'
 import { TaskProgressDataQS } from './infra/db/query-service/task-progress-data-qs'
 import { PatchTaskProgressDataUseCase } from './app/task-progress/patch-task-progress-data-usecase'
 import { PairFactory } from './domain/pair/pair-factory'
+import { PairService } from './domain/pair/pair-service'
+import { TeamService } from './domain/team/team-service'
+import { TeamFactory } from './domain/team/team-factory'
 
 @Module({
   imports: [],
@@ -78,6 +81,9 @@ import { PairFactory } from './domain/pair/pair-factory'
     GetTaskProgressDataUseCase,
     PatchTaskProgressDataUseCase,
     PairFactory,
+    PairService,
+    TeamService,
+    TeamFactory,
   ],
 })
 export class AppModule {}

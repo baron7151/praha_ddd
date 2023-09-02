@@ -38,9 +38,7 @@ export class PatchUserDataUseCase {
     if (userEntity !== undefined) {
       if (status && UserEntity.isStringInUserStatus(status)) {
         await this.saveChangeUserStatus(userEntity, status as UserStatus)
-        userEntity = (await this.userRepository.findByUserId(
-          new UserId(userId),
-        )) as UserEntity
+        userEntity = userEntity.changeStatus(status as UserStatus)
       }
       if (email || userName) {
         const newUserEntity = await this.userFactory.reconstruct({
@@ -134,20 +132,27 @@ export class PatchUserDataUseCase {
             const userEntities = await this.userRepository.findByTeamId(
               team.getId(),
             )
-            let teamUserNames = undefined
-            teamUserNames = userEntities!.map(
+            let otherTeamUserNames = undefined
+            const teamUserNames = userEntities!.map(
               (userEntity) => userEntity!.getAllProperties().userName,
+            )
+            otherTeamUserNames = teamUserNames.filter(
+              (name) => name.equals(userName) === false,
             )
             const teamName = team.getAllProperties().teamName
             UserService.notifyWithTeamMemberDecrease(
               teamName,
-              teamUserNames,
+              otherTeamUserNames,
               userName,
             )
           }
         }
         if (pairId) {
-          await this.movePairMemberWithPairMemberDecrease(pairId, userName)
+          await this.movePairMemberWithPairMemberDecrease(
+            userId,
+            pairId,
+            userName,
+          )
         }
       }
       const changeUserStatusEntity = new UserEntity(
@@ -162,6 +167,7 @@ export class PatchUserDataUseCase {
     }
   }
   async movePairMemberWithPairMemberDecrease(
+    moveUserId: UserId,
     moveUserPairId: PairId,
     changeStatusUserName: UserName,
   ) {
@@ -169,7 +175,9 @@ export class PatchUserDataUseCase {
     let moveUserNames
     const moveUserPair = await this.pairRepository.findByPairId(moveUserPairId)
     if (moveUserPair !== undefined) {
-      const moveUserIds = moveUserPair.getAllProperties().userIds
+      const moveUserIds = moveUserPair
+        .getAllProperties()
+        .userIds?.filter((userId) => userId.equals(moveUserId) === false)
       if (moveUserIds !== undefined) {
         const moveUsers = (await this.userRepository.findByManyUserIds(
           moveUserIds,
@@ -180,11 +188,13 @@ export class PatchUserDataUseCase {
         if (moveUserPair.isMinimumMember()) {
           if (moveUserPair.isBelongingToTeam()) {
             const moveUserTeamId = moveUserPair.getAllProperties().teamId!
-            const moveUserOtherPair = (await this.pairRepository.findByTeamId(
+            const moveUserOtherPairs = (await this.pairRepository.findByTeamId(
               moveUserTeamId,
-            ))!.filter((pairEntity) => pairEntity.getId() !== moveUserPairId)
-            const moveablePair = PairService.findMovablePair(moveUserOtherPair)
-            if (moveablePair !== undefined && moveUserOtherPair.length !== 0) {
+            ))!.filter(
+              (pairEntity) => pairEntity.getId().value !== moveUserPairId.value,
+            )
+            const moveablePair = PairService.findMovablePair(moveUserOtherPairs)
+            if (moveablePair !== undefined && moveUserOtherPairs.length !== 0) {
               await Promise.all(
                 moveUsers.map((moveUser) =>
                   this.userRepository.save(

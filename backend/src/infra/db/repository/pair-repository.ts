@@ -5,15 +5,15 @@ import { UserId } from 'src/domain/user/user-entity'
 import { prisma } from 'src/prisma'
 import { TeamId } from 'src/domain/team/team-entity'
 import { PairService } from 'src/domain/pair/pair-service'
+import { PairFactory } from 'src/domain/pair/pair-factory'
 
 @Injectable()
 export class PairRepository implements IPairRepository {
   public async save(savePairEntity: PairEntity): Promise<void> {
     const { pairId, pairName, teamId } = savePairEntity.getAllProperties()
-    const pairData = {
-      pairId: pairId.value,
+    const updatePairData = {
       pairName: pairName.value,
-      teamId: teamId?.value,
+      teamId: teamId?.value ?? null,
     }
     await prisma.$transaction(async (tx) => {
       const result = await tx.pair.findUnique({
@@ -22,15 +22,15 @@ export class PairRepository implements IPairRepository {
       if (result === null) {
         await tx.pair.create({
           data: {
-            ...pairData,
+            pairId: pairId.value,
+            ...updatePairData,
           },
         })
       } else {
         await tx.pair.update({
           where: { pairId: pairId.value },
           data: {
-            pairName: pairName.value,
-            teamId: teamId !== undefined ? teamId.value : null,
+            ...updatePairData,
           },
         })
       }
@@ -43,7 +43,7 @@ export class PairRepository implements IPairRepository {
       include: { user: true },
     })
     if (pairData !== null) {
-      return PairEntity.create({
+      return PairFactory.create({
         pairId: pairData.pairId,
         pairName: pairData.pairName,
         teamId: pairData.teamId,
@@ -74,7 +74,7 @@ export class PairRepository implements IPairRepository {
     })
     if (pairDatas !== null) {
       return pairDatas.map((pairData) =>
-        PairEntity.create({
+        PairFactory.create({
           pairId: pairData.pairId,
           pairName: pairData.pairName,
           teamId: pairData.teamId,

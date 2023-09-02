@@ -22,8 +22,8 @@ export class PairFactory {
   static create(props: {
     pairId: string
     pairName: string
-    teamId?: string
-    userIds?: string[]
+    teamId?: string | null
+    userIds?: string[] | null
   }): PairEntity {
     const { pairId, pairName, teamId, userIds } = props
     const mappedUserIds =
